@@ -104,10 +104,11 @@ highestRound=0
 i=1 
 
 for average in roundStatsAverage:
+    print(f"Average for {i}, {average}")
     if average > highestAverage:
         highestRound=i
         highestAverage = average
-        highestRoundNames = eachRoundsGroups[i]
+        highestRoundNames = eachRoundsGroups[i-1]
     i+=1
 
 print(f"Best overall picks from round {highestRound}:")
