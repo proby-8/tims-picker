@@ -104,7 +104,6 @@ highestRound=0
 i=1 
 
 for average in roundStatsAverage:
-    print(f"Average for {i}, {average}")
     if average > highestAverage:
         highestRound=i
         highestAverage = average
