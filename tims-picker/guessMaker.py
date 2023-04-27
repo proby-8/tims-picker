@@ -2,6 +2,8 @@ from functions import getPlayerNames, getPlayerID, getGPGP, getGPGAT, getGPGFT, 
 import datetime
 import time
 
+# add something that prints the time window for the round you want
+
 start_time = time.time()
 date = datetime.date.today().strftime('%Y-%m-%d')
 groupsToLookAt=3
