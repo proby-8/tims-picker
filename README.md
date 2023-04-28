@@ -6,7 +6,7 @@ This program provides a variety of functions that together provide a way to reli
 
 ## **Function 1 (Make a guess using a predefined formula):**
 
-This function takes a formula I created after testing many, and automatically pulls data from the NHL api to compare the stats of each possible pick, before returning the best players. Additionally, it checks all rounds (new players become available at different times throughout the day), and compares each group to find the best overall time of pick. At the time of writing this, the pick percentage of this program is 34%, while the best percentage globally on the leaderboard is 33%.
+`This function takes a formula I created after testing many, and automatically pulls data from the NHL api to compare the stats of each possible pick, before returning the best players. Additionally, it checks all rounds (new players become available at different times throughout the day), and compares each group to find the best overall time of pick. At the time of writing this, the pick percentage of this program is 34%, while the best percentage globally on the leaderboard is 33%.`
 
 
 ## **Function 2 (Make a guess using an AI formulated calculation):**
