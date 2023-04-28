@@ -34,8 +34,13 @@ def subtractDays(startDate, daysChange=1):
 def getStats(path, date, daysToLookAt, daysGoingUp):
     daysSkipped = 0
     startTime = time.time()
+    alwaysSkip = False
     for i in range(0,int(daysToLookAt)):
         print("Currently on day " + str(date))
+        if ((date == subtractDays(datetime.datetime.today().strftime('%Y-%m-%d'))) or (alwaysSkip)):
+            skipDay = True
+            alwaysSkip = True
+
         skipDay = False
         try:
             players_fullName = (getPlayerNames(date, 1))
@@ -103,8 +108,7 @@ def getStats(path, date, daysToLookAt, daysGoingUp):
                     df.to_csv(path + "train_test" + str(group) + ".csv", index=False, header=True, mode='w')
                     oldDF.to_csv(path + "train_test" + str(group) + ".csv", index=False, header=False, mode='a')
                 else:                   
-                    todayDate = datetime.datetime.today().strftime('%Y-%m-%d')
-                    todayDate = subtractDays(todayDate)
+                    todayDate = subtractDays(datetime.datetime.today().strftime('%Y-%m-%d'))
                     keepHeader=False
                     if (date == todayDate):
                         df = df.set_axis(['Date', 'Scored', 'Name', 'Goals per Game', "Team's Goals per Game", "Other Team's Goals Against"], axis=1)

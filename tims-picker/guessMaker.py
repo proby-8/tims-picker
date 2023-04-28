@@ -111,7 +111,4 @@ def main():
     print(f"\nBest overall picks: (round {highestRound}):")
     print(f"{highestRoundNames[0]}\n{highestRoundNames[1]}\n{highestRoundNames[2]}\n")
 
-
-
-    print("All done!")
     printTime(time.time() - start_time)
