@@ -1,6 +1,5 @@
 from guessMakerFunctions import getPlayerNames, getPlayerID, getGPGP, getGPGAT, getGPGFT, printTime
 import datetime
-import time
 
 def main():
 

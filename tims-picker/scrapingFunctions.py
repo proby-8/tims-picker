@@ -84,7 +84,7 @@ def getStats(path, date, daysToLookAt, daysGoingUp):
                         playerScored.append(0)
 
                     # calculates a players goals per game (if player scored day of, average doesnt adjust for this)
-                    gpg.append(getGPGP(playerID, playerScored))
+                    gpg.append(getGPGP(playerID))
 
                     # team gpg
                     tgpg.append(getGPGFT(playerID))
@@ -215,7 +215,7 @@ def fixName (first_name, last_name, name):
     # webscrape name from nhl website
 
 
-def getGPGP(playerID, playerScored, seasons=1):
+def getGPGP(playerID, seasons=1):
     # how many seasons to look back on
 
     final_GPGP=0
@@ -296,15 +296,13 @@ def getOtherTeamGA(playerID, date):
     # print(url)
     try:
         response = requests.get(url)
-        theirTeamID = json.loads(response.content)['people'][0]['currentTeam']['id']
         teamName = json.loads(response.content)['people'][0]['currentTeam']['name']
         # print(content)
     except:
         # if the API doesn't have the team this guy is on
-        theirTeamID = -1
         teamName = ""
 
-    teamID = getTeamAgainstID(date, theirTeamID, teamName)
+    teamID = getTeamAgainstID(date, teamName)
     if teamID == -1:
         return -1
     
@@ -325,7 +323,7 @@ def getOtherTeamGA(playerID, date):
     return tgpg
 
 
-def getTeamAgainstID(date, theirTeamID, teamName):
+def getTeamAgainstID(date, teamName):
     URL = "https://statsapi.web.nhl.com/api/v1/schedule?date=" + str(date)
     # print(URL)
 
@@ -383,8 +381,8 @@ def getGoalScorers(date):
     gameList = []
     while x < numGames:
         gameList.append(games[x]['gamePk'])
-        awayTeams = games[x]['teams']['away']['team']['name']
-        homeTeams = games[x]['teams']['home']['team']['name']
+        #awayTeams = games[x]['teams']['away']['team']['name']
+        #homeTeams = games[x]['teams']['home']['team']['name']
         #print(awayTeams)
         #print(homeTeams)
         x+=1
@@ -437,7 +435,6 @@ def getStatsTemp(group):
         gpg = []
         tgpg = []
         otga = []
-        playerScored = []
 
         for i in range(0,len(players_fullName)):
             # get the date
@@ -452,7 +449,7 @@ def getStatsTemp(group):
             playerID = getPlayerID(players_firstName[i], players_lastName[i])
 
             # calculates a players goals per game (if player scored day of, average doesnt adjust for this)
-            gpg.append(getGPGP(playerID, playerScored))
+            gpg.append(getGPGP(playerID))
 
             # team gpg
             tgpg.append(getGPGFT(playerID))

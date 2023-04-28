@@ -1,6 +1,5 @@
 import pandas as pd
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 def make_input_fn(data_df, label_df, num_epochs=25, shuffle=False, batch_size=16):
     def input_function():  # inner function, this will be returned
