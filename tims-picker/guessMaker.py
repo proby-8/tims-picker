@@ -4,7 +4,6 @@ import time
 
 def main():
 
-    start_time = time.time()
     date = datetime.date.today().strftime('%Y-%m-%d')
     groupsToLookAt=3
 
@@ -111,4 +110,3 @@ def main():
     print(f"\nBest overall picks: (round {highestRound}):")
     print(f"{highestRoundNames[0]}\n{highestRoundNames[1]}\n{highestRoundNames[2]}\n")
 
-    printTime(time.time() - start_time)
