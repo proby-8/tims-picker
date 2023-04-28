@@ -3,6 +3,9 @@ from datetime import datetime
 import scrapingFunctions
 import os
 import guessMaker
+import pandas as pd
+import aiPrediction
+
 
 path = "lib\\"
 try:
@@ -19,7 +22,13 @@ choice = int(input())
 if (choice == 1):
     guessMaker.main()
 elif(choice == 2):
-    print("No")
+    # create csv of todays picks
+
+    df = scrapingFunctions.getStatsTemp(group = 1)
+    print(df)
+    aiPrediction.main(df, 1)
+
+    # use AI guessing
 elif (choice == 3):
     daysGoingUp=True
     print("Would you like to add recent games, or continue adding old games (o/n)? ", end="")

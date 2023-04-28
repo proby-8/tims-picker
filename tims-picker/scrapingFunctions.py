@@ -211,7 +211,7 @@ def fixName (first_name, last_name, name):
     # webscrape name from nhl website
 
 
-def getGPGP(playerID, playerScored, seasons=3):
+def getGPGP(playerID, playerScored, seasons=1):
     # how many seasons to look back on
 
     final_GPGP=0
@@ -220,10 +220,8 @@ def getGPGP(playerID, playerScored, seasons=3):
     content = json.loads(response.content)['stats']
     splits = content[0]['splits']
     df_splits = (pd.json_normalize(splits, sep = "_" ).query('league_name == "National Hockey League"'))
-    if playerScored:
-        gpg = (df_splits['stat_goals']) / (df_splits['stat_games'])
-    else:
-        gpg = (df_splits['stat_goals']) / (df_splits['stat_games'])
+
+    gpg = (df_splits['stat_goals']) / (df_splits['stat_games'])
 
     count=0
     loop=0
@@ -412,3 +410,59 @@ def getGoalScorers(date):
 
     return goalScorers
 
+
+def getStatsTemp(group):
+
+    date = datetime.datetime.today().strftime('%Y-%m-%d')
+
+    skipDay = False
+    try:
+        players_fullName = (getPlayerNames(date, 1))
+    except:
+        # no data available for this
+        skipDay = True 
+        
+    if (skipDay == False):
+        players_fullName = (getPlayerNames(date, group))
+        df = pd.DataFrame (players_fullName)
+
+        # list items for each group
+        dates = []
+        players_firstName = []
+        players_lastName = []
+        gpg = []
+        tgpg = []
+        otga = []
+        playerScored = []
+
+        for i in range(0,len(players_fullName)):
+            # get the date
+            dates.append(date)
+
+            # this part getes players first and last name
+            both = players_fullName[i].split()
+            players_firstName.append(both[0])
+            players_lastName.append(both[1])
+
+            # this gets a player's id number
+            playerID = getPlayerID(players_firstName[i], players_lastName[i])
+
+            # calculates a players goals per game (if player scored day of, average doesnt adjust for this)
+            gpg.append(getGPGP(playerID, playerScored))
+
+            # team gpg
+            tgpg.append(getGPGFT(playerID))
+
+            # other teams goals against
+            otga.append(getOtherTeamGA(playerID, date))
+
+        # create dataframe
+        dfnames = pd.DataFrame(players_fullName)
+        dfgpg = pd.DataFrame (gpg)
+        dfdates = pd.DataFrame (dates)
+        dftgpg = pd.DataFrame (tgpg)
+        dfotga = pd.DataFrame (otga)
+        df = pd.concat([dfdates, dfnames, dfgpg, dftgpg, dfotga], axis=1, sort=False)
+
+        df = df.set_axis(['Date', 'Name', 'Goals per Game', "Team's Goals per Game", "Other Team's Goals Against"], axis=1)
+        return df
