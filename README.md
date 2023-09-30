@@ -1,6 +1,8 @@
 # tims-picker
 ## **About this program:**
 
+NOTE: The source of the possible player's names has been discontinued, this will be fixed shortly after the NHL season begins (October 10).
+
 This program provides a variety of functions that together provide a way to reliably pick winning hockey challenge picks for Tim Hortons Hockey Pick Challenge. Note that as this program does not enter the picks for you, it is not against Tim Hortons TOS. The three functions and their uses are described below.
 
 
