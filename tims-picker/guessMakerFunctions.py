@@ -7,7 +7,12 @@ import math
 
 def getPlayerNames(date, round, group): 
     URL = "http://www.hockeychallengepicks.ca/history/" + date + str(round)
-    page = requests.get(URL)
+    try:
+        page = requests.get(URL)
+    except:
+        print("Fatal error: Could not connect to source of player names.")
+        exit(1)
+
     soup = BeautifulSoup(page.content, "html.parser")
     results = soup.find(id="pick-" + str(group))
 
