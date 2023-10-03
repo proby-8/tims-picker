@@ -6,6 +6,8 @@ import math
 
 class Player:
 
+    allRosters = []
+
     def __str__(self):
         return (f"{self.__name} : {self.__stat}")
     
@@ -42,21 +44,28 @@ class Player:
     def __getPlayerID(self, name):
         base_url = "https://statsapi.web.nhl.com/api/v1/teams/"
         # 1-10, 12-30, 52-54
-        team_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 52, 53, 54]
+        team_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 52, 53, 54]
+
+        # this has to rather be changed yearly or set up using datetime
         for i in team_ids:
             try:
                 # this has to rather be changed yearly or set up using datetime
-                url = base_url + str(i) + "/roster/" + "?season=" + "20232024"
-                df_roster = pd.json_normalize(requests.get(url).json()["roster"]).astype(str)
+                # url = base_url + str(i) + "/roster/" + "?season=" + "20232024"
+                df_roster = self.allRosters[i]
                 id = df_roster[df_roster['person.fullName'].str.contains(name)]['person.id'].values[0]
+                self.__team = i
                 return id
             except:
                 pass
         
         return -1
     
-
-    def __getGPGP(self, playerID, seasons=3):
+    # 5 seasons was 103 correct (55 33 17)
+    # 4 seasons was 110 correct (55 35 20)
+    # 3 seasons was 110 correct (55 35 20)
+    # 2 seasons was 118 correct (58 36 24)
+    # 1 season was 111 correct (64 33 14)
+    def __getGPGP(self, playerID, seasons=2):
         # how many seasons to look back on
 
         final_GPGP=0
@@ -95,7 +104,9 @@ class Player:
 
 
     def __getGPGFT(self, playerID):
-        teamID = self.__getTeam(playerID)
+        teamID = self.__team
+        if teamID == -1:
+            return -1
         URL = "https://statsapi.web.nhl.com/api/v1/teams/" + str(teamID) + "/stats"
         response = requests.get(URL)
         tgpg = json.loads(response.content)
@@ -103,6 +114,8 @@ class Player:
             tgpg = tgpg['stats'][0]['splits'][0]['stat']['goalsPerGame']
         except:
             # if tgpg cannot be found, give average of 3
+            # this should never happen since i changed how we get playerID
+            print(playerID)
             tgpg = 3 
 
         return tgpg
@@ -120,24 +133,40 @@ class Player:
 
 
         # print float??
-        print("--- %d seconds ---" %seconds)
+        print("--- %lf seconds ---" %seconds)
     
 
     def __calculateStat(self):
         # return (self.__goalsPerGame * self.__tgpg)
-        return (self.__goalsPerGame)
+        return (self.__goalsPerGame * self.__tgpg)
+    
+    @classmethod
+    def initTeamsRosters(cls):
+        base_url = "https://statsapi.web.nhl.com/api/v1/teams/"
+        team_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 52, 53, 54]
+        for i in team_ids:
+            # this has to rather be changed yearly or set up using datetime
+            print(f"Loading roster data for team {i}")
+            url = base_url + str(i) + "/roster/" + "?season=" + "20232024"
+            df_roster = pd.json_normalize(requests.get(url).json()["roster"]).astype(str)
+            cls.allRosters.append(df_roster)
+
+        return
+        # return allRosters[allRosters.index(teamID)]
     
 
     def __init__(self, name):
+        if (name == ""):
+            return
         # change to first and last name
         self.__name = self.__fixName(name.split()[0], name.split()[1])
 
         # get playerID
-        startTime = time.time()
+        #startTime = time.time()
         self.__playerID = self.__getPlayerID(self.__name)
-        endTime = time.time()
-        timeElapsed = endTime - startTime
-        self.printTime(timeElapsed)
+        #endTime = time.time()
+        #timeElapsed = endTime - startTime
+        #self.printTime(timeElapsed)
         if self.__playerID == -1:
             # player's team (and id) could not be found
             self.__goalsPerGame = 0
@@ -148,7 +177,7 @@ class Player:
             self.__goalsPerGame = self.__getGPGP(self.__playerID)
 
             # team gpg
-            # self.__tgpg = self.__getGPGFT(self.__playerID)
+            self.__tgpg = self.__getGPGFT(self.__playerID)
 
             # stat
             self.__stat = self.__calculateStat()
