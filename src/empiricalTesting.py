@@ -3,8 +3,11 @@ import Player
 
 
 def runTest():
-    # init roster
+    # init linear est
     obj = Player.Player("")
+    obj.makeLinearEstimator()
+    exit(1)
+    # init roster
     obj.initTeamsRosters()
 
     # init variables
