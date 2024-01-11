@@ -19,7 +19,7 @@ To continually improve the accuracy of the machine learning AI, it's important t
 
 ## Running this Program
 
-First install all packages within requirements.txt:
-```pip install -r requirements.txt```
-Start the main script:
+First install all packages within requirements.txt:<br/>
+```pip install -r requirements.txt```<br/><br/>
+Start the main script:<br/>
 ```python src/main.py```
