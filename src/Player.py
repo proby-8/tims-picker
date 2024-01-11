@@ -158,7 +158,7 @@ class Player:
         return
         # return allRosters[allRosters.index(teamID)]    
 
-    def __init__(self, name):
+    def __init__(self, name, id=-1): # type: ignore
         if (name == ""):
             return
         # change to first and last name
@@ -166,7 +166,38 @@ class Player:
 
         # get playerID
         #startTime = time.time()
-        self.__playerID = self.__getPlayerID(self.__name)
+        if (id == -1):
+            self.__playerID = self.__getPlayerID(self.__name)
+        else:
+            self.__playerID = id
+
+        #endTime = time.time()
+        #timeElapsed = endTime - startTime
+        #self.printTime(timeElapsed)
+        if self.__playerID == -1:
+            # player's team (and id) could not be found
+            self.__goalsPerGame = 0
+            self.__tgpg = 0
+            self.__stat = 0
+        else:
+            # calculates a player's goals per game
+            self.__goalsPerGame = self.__getGPGP(self.__playerID)
+
+            # team gpg
+            # self.__tgpg = self.__getGPGFT(self.__playerID)
+
+            # stat
+            self.__stat = self.__calculateStat()
+
+    def __init__(self, firstName, lastName, id=-1):
+
+        # change to first and last name
+        self.__name = self.__fixName(firstName, lastName)
+
+        # get playerID
+        #startTime = time.time()
+        if (id == -1):
+            self.__playerID = self.__getPlayerID(self.__name)
         #endTime = time.time()
         #timeElapsed = endTime - startTime
         #self.printTime(timeElapsed)
