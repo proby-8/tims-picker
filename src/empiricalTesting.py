@@ -3,7 +3,6 @@ import Player
 
 
 def runTest():
-    # init linear est
     obj = Player.Player("")
     obj.makeLinearEstimator()
 

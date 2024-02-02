@@ -1,5 +1,6 @@
 from formulaGuess import makeGuess
 from empiricalTesting import runTest
+from aiMain import aiGuess
 
 if __name__ == "__main__":
     print("\nPlease select a function:")
