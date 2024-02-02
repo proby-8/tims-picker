@@ -6,7 +6,7 @@ def runTest():
     # init linear est
     obj = Player.Player("")
     obj.makeLinearEstimator()
-    exit(1)
+
     # init roster
     obj.initTeamsRosters()
 

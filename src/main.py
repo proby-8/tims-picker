@@ -7,6 +7,7 @@ if __name__ == "__main__":
     print("2: Make a guess using an AI formulated calculation")
     print("3: Update the csv data files")
     print("4: Test formulas")
+    print("5: Rank all players playing today")
     choice = int(input("Choice: "))
 
     if (choice == 1):
@@ -22,6 +23,9 @@ if __name__ == "__main__":
     elif (choice == 4):
         print("Time to do some empirical testing...")
         runTest()
+    elif (choice == 5): 
+        print("Loading data...")
+        allPlayers()
     else:
         print("Invalid input")
         exit(1)

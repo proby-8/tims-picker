@@ -24,3 +24,6 @@ In order to continually update the accuracy of the machine learning AI, it is im
 ## **Running this program:**
 
 First install all packages within requirements.txt, and then simply run main.py and follow the terminal instructions.
+```
+pip3 install -r requirements.txt
+```
