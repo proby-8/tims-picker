@@ -21,12 +21,10 @@ Start the main script:<br/>
 ```python src/main.py```
 
 ## Images
-
-Predefined Formula:
+Predefined Formula:        |  Linear Estimator
+:-------------------------:|:-------------------------:
 ![image](https://github.com/proby-8/tims-picker/assets/109328434/7d7d8ace-0a5d-4f16-887b-9086ea36baea)
-
-AI:
-![image](https://github.com/proby-8/tims-picker/assets/109328434/7064cf24-dc40-4979-a3cb-09f935f36d25)
+  |  ![image](https://github.com/proby-8/tims-picker/assets/109328434/7064cf24-dc40-4979-a3cb-09f935f36d25)
 
 
 
