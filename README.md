@@ -1,7 +1,7 @@
 # Tims-Picker
 ## About this Program
 
-UPDATE : As of Feb. 2, 2024, this program has been reworked to rank all players playing today. This is because it is no longer possible to access Tim Horton's possible player picks, instead the user must now look through the sorted list and compare with possible Tim's picks.<br><br>
+UPDATE : As of Feb. 2, 2024, this program has been reworked to rank all players playing today. This is because it is no longer possible to access Tim Horton's possible player picks, instead the user must now look through the sorted list and compare with possible Tim's picks.<br>
 
 This program offers a set of functions that provide a reliable method for selecting winning picks for the Tim Hortons Hockey Pick Challenge. As this program only suggests picks and does not enter them, it does not violate Tim Hortons' Terms of Service. The program includes three main functions, described below.
 
