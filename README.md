@@ -23,7 +23,7 @@ Start the main script:<br/>
 ## Images
 Predefined Formula:        |  Linear Estimator
 :-------------------------:|:-------------------------:
-![image](https://github.com/proby-8/tims-picker/assets/109328434/7d7d8ace-0a5d-4f16-887b-9086ea36baea)  |  ![image](https://github.com/proby-8/tims-picker/assets/109328434/7064cf24-dc40-4979-a3cb-09f935f36d25)
+![image](https://github.com/proby-8/tims-picker/assets/109328434/7d7d8ace-0a5d-4f16-887b-9086ea36baea)  |  ![image](https://github.com/proby-8/tims-picker/assets/109328434/92117d39-6450-40ee-be60-8d12da7bee04)
 
 
 
