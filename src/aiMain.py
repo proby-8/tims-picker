@@ -93,7 +93,8 @@ def test(createNew):
 
     # Print the sorted list
     print("\nPlayers in order:")
-
+    print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))   
+    print("") 
     for player_info in sorted_playersAI:
         print(f"\t{stringFormat(player_info)}")
 

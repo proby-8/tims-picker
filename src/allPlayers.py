@@ -75,8 +75,8 @@ def getAllPlayers():
     # get list of all teams playing
 
     # currently testing during all-star week
-    target_date = "2024-01-26"
-    # target_date = datetime.date.today().strftime('%Y-%m-%d')
+    # target_date = "2024-01-26"
+    target_date = datetime.date.today().strftime('%Y-%m-%d')
 
     URL = f"https://api-web.nhle.com/v1/schedule/{target_date}"
 
@@ -97,8 +97,8 @@ def rank():
     # get list of all teams playing
 
     # currently testing during all-star week
-    target_date = "2024-01-26"
-    # target_date = datetime.date.today().strftime('%Y-%m-%d')
+    # target_date = "2024-01-26"
+    target_date = datetime.date.today().strftime('%Y-%m-%d')
 
     URL = f"https://api-web.nhle.com/v1/schedule/{target_date}"
 
@@ -118,7 +118,8 @@ def rank():
     name_padding = 30
     stat_padding = 10
 
-    print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))    
+    print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))   
+    print("") 
     for player in allPlayers:
         print(f"\t{player}")
 
