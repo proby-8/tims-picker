@@ -19,6 +19,15 @@ class Player:
     def getName(self):
         return self.__name
     
+    def getGPG(self):
+        return self.__goalsPerGame
+    
+    def getTGPG(self):
+        return self.__teamGoalsPerGame
+    
+    def getOTGA(self):
+        return self.__otherTeamGoalsAgainst
+    
     def getTeamName(self):
         return self.__teamName
     
@@ -103,4 +112,4 @@ class Player:
     def __str__ (self):
         name_padding = 30
         stat_padding = 10
-        return "{:<{}} {:>{}}".format(self.getName(), name_padding, "{:.2f}".format(self.getStat()), stat_padding)
+        return "{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(self.getName(), name_padding, "{:.2f}".format(float(self.__stat)), stat_padding, "{:.2f}".format(self.__goalsPerGame), stat_padding, "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding)

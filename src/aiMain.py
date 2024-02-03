@@ -100,4 +100,4 @@ def test(createNew):
 def stringFormat(player_info):
     name_padding = 30
     stat_padding = 10
-    return "{:<{}} {:>{}}".format(player_info['info'].getName(), name_padding, "{:.2f}".format(player_info['predictVal']), stat_padding)
+    return "{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(player_info['info'].getName(), name_padding, "{:.2f}".format(player_info['predictVal']), stat_padding, "{:.2f}".format(player_info['info'].getGPG()), stat_padding, "{:.2f}".format(player_info['info'].getTGPG()), stat_padding, "{:.2f}".format(player_info['info'].getOTGA()), stat_padding)

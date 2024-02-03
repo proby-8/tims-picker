@@ -113,7 +113,12 @@ def rank():
 
     allPlayers = getPlayers(teams)
     allPlayers = sorted(allPlayers, reverse=True)
+
     print("\nPlayers in order:")
+    name_padding = 30
+    stat_padding = 10
+
+    print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))    
     for player in allPlayers:
         print(f"\t{player}")
 

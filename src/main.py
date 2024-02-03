@@ -1,6 +1,6 @@
 if __name__ == "__main__":
     print("Please select a function:")
-    print("1: Rank all players playing today")
+    print("1: Rank all players playing today based off of a predefined formula")
     print("2: Make a guess using an AI formulated calculation")
     choice = int(input("Choice: "))
     print("")
