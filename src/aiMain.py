@@ -93,6 +93,8 @@ def test(createNew):
 
     # Print the sorted list
     print("\nPlayers in order:")
+    name_padding = 30
+    stat_padding = 10
     print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))   
     print("") 
     for player_info in sorted_playersAI:
