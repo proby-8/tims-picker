@@ -9,7 +9,7 @@
 import os
 import numpy as np
 import pandas as pd
-import requests
+import time
 import tensorflow as tf
 import allPlayers
 
@@ -22,7 +22,10 @@ def aiGuess():
         verification = int(input("Are you sure you want to create a new model?\n(0) to use saved, (1) to create new: "))
         if (verification != 1):
             choice = 0
+
+    startTime = time.time()
     test(choice)
+    print(f"Time elapsed: {(time.time() - startTime)}")
 
 
 def test(createNew):
@@ -89,7 +92,9 @@ def test(createNew):
         playersAI.append(playerInfo)
     
     # Sort the playersAI list based on 'predict' value in each dictionary
+    startTime = time.time()
     sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
+    print(f"Time elapsed: {(time.time() - startTime)}")
 
     # Print the sorted list
     print("\nPlayers in order:")
