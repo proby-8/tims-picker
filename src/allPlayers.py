@@ -1,5 +1,8 @@
 import datetime
+from itertools import chain
+import time
 import requests
+from multiprocessing import Pool
 
 import Player
 
@@ -54,26 +57,33 @@ def getTeams(data, target_date):
 
     return teams
 
+def getPlayersFromTeam(team):
+    Player.Player.initTeamStats(team['id'])
+    allPlayers = []
+
+    roster = getRoster(team['abbr'])
+    print(f"Gathering stats for team {team['name']}")
+
+    url = f"https://api-web.nhle.com/v1/club-stats/{team['abbr']}/20232024/2"
+    r = requests.get(url)
+    data = r.json()    
+
+    for player in roster:
+        allPlayers.append(Player.Player(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], data))
+
+    return allPlayers
+
+
 def getPlayers(teams):
     allPlayers = []
 
-    for team in teams:
-        roster = getRoster(team['abbr'])
-        print(f"Gathering stats for team {team['name']}")
-
-        url = f"https://api-web.nhle.com/v1/club-stats/{team['abbr']}/20232024/2"
-        r = requests.get(url)
-        data = r.json()    
-
-        for player in roster:
-            allPlayers.append(Player.Player(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], data))
+    with Pool() as pool:
+        result_lists = pool.map(getPlayersFromTeam, teams)
+        allPlayers.extend(chain.from_iterable(result_lists))
 
     return allPlayers
 
 def getAllPlayers():
-    Player.Player.initTeamStats()
-    # get list of all teams playing
-
     # currently testing during all-star week
     # target_date = "2024-01-26"
     target_date = datetime.date.today().strftime('%Y-%m-%d')
@@ -85,33 +95,18 @@ def getAllPlayers():
 
     teams = getTeams(data, target_date)
 
-    allPlayers = getPlayers(teams)
-    
-    # don't bother sorting
-    # allPlayers = sorted(allPlayers, reverse=True)
-
-    return allPlayers
-
-def rank():
-    Player.Player.initTeamStats()
-    # get list of all teams playing
-
-    # currently testing during all-star week
-    # target_date = "2024-01-26"
-    target_date = datetime.date.today().strftime('%Y-%m-%d')
-
-    URL = f"https://api-web.nhle.com/v1/schedule/{target_date}"
-
-    r = requests.get(URL)
-    data = r.json()
-
-    teams = getTeams(data, target_date)
     print("Teams playing today:")
     for team in teams:
         print(f"\t{team['name']}")
     print("")
 
     allPlayers = getPlayers(teams)
+
+    return allPlayers
+
+
+def rank():
+    allPlayers = getAllPlayers()
     allPlayers = sorted(allPlayers, reverse=True)
 
     print("\nPlayers in order:")

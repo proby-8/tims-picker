@@ -38,17 +38,17 @@ class Player:
         return self.__teamId
     
     @classmethod
-    def initTeamStats( cls ):
+    def initTeamStats( cls, teamId ):
         url = f"https://api.nhle.com/stats/rest/en/team/summary?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
         r = requests.get(url)
         data = r.json()
 
         for team in data["data"]:
-            teamId = team["teamId"]
-            cls.teamStats[teamId] = {
-                                        "gpg" : team["goalsForPerGame"],
-                                        "ga"  : team['goalsAgainstPerGame']
-                                    }
+            if (teamId == team['teamId'] or (teamId == -1)):
+                cls.teamStats[teamId] = {
+                                            "gpg" : team["goalsForPerGame"],
+                                            "ga"  : team['goalsAgainstPerGame']
+                                        }
     
     def getFeatures(self):
         return {
@@ -77,10 +77,15 @@ class Player:
                 self.__goalsPerGame = self.__getGPGP(self.__playerID)
 
             # teams goals per game
-            self.__teamGoalsPerGame = Player.teamStats[self.__teamId]['gpg']
+            if self.__teamId in Player.teamStats:
+                self.__teamGoalsPerGame = Player.teamStats[self.__teamId]['gpg']
+                self.__otherTeamGoalsAgainst = Player.teamStats[self.__teamId]['ga']
+            else:
+                # Handle the case where the key is not present (e.g., set a default value)
+                self.__teamGoalsPerGame = 0  # You can change this to an appropriate default value
+                self.__otherTeamGoalsAgainst = 0
 
             # other team goals against
-            self.__otherTeamGoalsAgainst = Player.teamStats[self.__teamId]['ga']
 
             # stat
             self.__stat = self.__calculateStat()

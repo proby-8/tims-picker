@@ -28,63 +28,74 @@ def aiGuess():
     print(f"Time elapsed: {(time.time() - startTime)}")
 
 
+def createNewModel():
+    dataset1 = pd.read_csv("lib\\train_test1.csv")
+    dataset2 = pd.read_csv("lib\\train_test2.csv")
+    dataset3 = pd.read_csv("lib\\train_test3.csv")
+
+    dataset = pd.concat([dataset1, dataset2, dataset3], ignore_index=True)
+
+    # Separate features and labels
+    labels = dataset.pop("Scored")
+    dates = dataset.pop("Date")
+    names = dataset.pop("Name")
+    features = dataset
+
+    # Split the data into training and testing sets
+    totalDates = dates.unique()
+
+    train_size = totalDates.size
+
+    train_features = np.asarray(features).astype('float32')
+    train_labels = labels
+
+    # Create TensorFlow datasets
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels)).batch(1)
+
+    # Define and compile the model
+    model = tf.keras.models.Sequential([tf.keras.layers.Dense(1)])
+    optimizer = tf.keras.optimizers.Adagrad(learning_rate=0.05)
+
+    model.compile(optimizer=optimizer, loss="mse", metrics=['mae'])
+
+    # Train the model
+    numEpochs = int(input("Enter number of epochs: "))
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, restore_best_weights=True)
+    model.fit(train_dataset, epochs=numEpochs, callbacks=[early_stopping])
+
+    model.fit(train_dataset, epochs=numEpochs)  # Adjust the number of epochs as needed
+
+    # save the model
+    model.save("savedAiModel")
+
+
 def test(createNew):
 
     if (createNew):
-        dataset1 = pd.read_csv("lib\\train_test1.csv")
-        dataset2 = pd.read_csv("lib\\train_test2.csv")
-        dataset3 = pd.read_csv("lib\\train_test3.csv")
-
-        dataset = pd.concat([dataset1, dataset2, dataset3], ignore_index=True)
-
-        # Separate features and labels
-        labels = dataset.pop("Scored")
-        dates = dataset.pop("Date")
-        names = dataset.pop("Name")
-        features = dataset
-
-        # Split the data into training and testing sets
-        totalDates = dates.unique()
-
-        train_size = totalDates.size
-
-        train_features = np.asarray(features).astype('float32')
-        train_labels = labels
-
-        # Create TensorFlow datasets
-        train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels)).batch(1)
-
-        # Define and compile the model
-        model = tf.keras.models.Sequential([tf.keras.layers.Dense(1)])
-        optimizer = tf.keras.optimizers.Adagrad(learning_rate=0.05)
-
-        model.compile(optimizer=optimizer, loss="mse", metrics=['mae'])
-
-        # Train the model
-        numEpochs = int(input("Enter number of epochs: "))
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, restore_best_weights=True)
-        model.fit(train_dataset, epochs=numEpochs, callbacks=[early_stopping])
-
-        model.fit(train_dataset, epochs=numEpochs)  # Adjust the number of epochs as needed
-
-        # save the model
-        model.save("savedAiModel")
+        createNewModel()
 
     # load the model
     model = tf.keras.models.load_model("savedAiModel")
-
 
     # get today's players
     players = allPlayers.getAllPlayers()
 
     playersAI = []
 
-    for player in players:        
-        player_features = player.getFeatures()
-        prediction_features = np.array(list(player_features.values())).astype('float32')
-        prediction_features = prediction_features.reshape(1, -1)  # Reshape for model input
-        prediction = model.predict(prediction_features, verbose=0)[0][0]
+    # Assuming players is a list of player objects
+    all_features = [list(player.getFeatures().values()) for player in players]
+    all_features = np.array(all_features, dtype='float32')
 
+    # Reshape for model input
+    all_features_reshaped = all_features.reshape(len(players), -1)
+
+    # Make predictions for all players at once
+    predictions = model.predict(all_features_reshaped, verbose=0)
+
+    # Access individual predictions as needed
+    for i, player in enumerate(players):
+        prediction = predictions[i][0]
+        # Rest of your code
         playerInfo = {
             'info': player,
             'predictVal': prediction
@@ -92,9 +103,7 @@ def test(createNew):
         playersAI.append(playerInfo)
     
     # Sort the playersAI list based on 'predict' value in each dictionary
-    startTime = time.time()
     sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
-    print(f"Time elapsed: {(time.time() - startTime)}")
 
     # Print the sorted list
     print("\nPlayers in order:")
