@@ -20,6 +20,9 @@ class Player:
     def getStat(self):
         return self.__stat
     
+    def setStat(self, stat):
+        self.__stat = stat
+    
     def getName(self):
         return self.__name
     
@@ -59,6 +62,16 @@ class Player:
                                             "gpg" : team["goalsForPerGame"],
                                             "ga"  : team['goalsAgainstPerGame']
                                         }
+                
+    @classmethod
+    def printHeader ( cls ):
+        print("\nPlayers in order:")
+
+        name_padding = 30
+        stat_padding = 10
+
+        print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "5GPG", stat_padding, "HGPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))   
+        print("") 
     
     def getFeatures(self):
         return {

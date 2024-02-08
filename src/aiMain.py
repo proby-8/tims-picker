@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import time
 import tensorflow as tf
+from Player import Player
 import allPlayers
 
 def aiGuess():
@@ -97,7 +98,7 @@ def test(createNew):
         prediction = predictions[i][0]
         # Rest of your code
         playerInfo = {
-            'info': player,
+            'player': player,
             'predictVal': prediction
         }
         playersAI.append(playerInfo)
@@ -106,15 +107,7 @@ def test(createNew):
     sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
 
     # Print the sorted list
-    print("\nPlayers in order:")
-    name_padding = 30
-    stat_padding = 10
-    print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))   
-    print("") 
+    Player.printHeader()
     for player_info in sorted_playersAI:
-        print(f"\t{stringFormat(player_info)}")
-
-def stringFormat(player_info):
-    name_padding = 30
-    stat_padding = 10
-    return "{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(player_info['info'].getName(), name_padding, "{:.2f}".format(player_info['predictVal']), stat_padding, "{:.2f}".format(player_info['info'].getGPG()), stat_padding, "{:.2f}".format(player_info['info'].getTGPG()), stat_padding, "{:.2f}".format(player_info['info'].getOTGA()), stat_padding)
+        player_info['player'].setStat(player_info['predictVal'])
+        print(f"\t{player_info['player']}")
