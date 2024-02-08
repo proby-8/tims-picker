@@ -1,3 +1,5 @@
+import sys
+import time
 import requests
 import json
 import pandas as pd
@@ -21,8 +23,14 @@ class Player:
     def getName(self):
         return self.__name
     
+    def getId(self):
+        return self.__playerID
+    
     def getGPG(self):
         return self.__goalsPerGame
+    
+    def getHGPG(self):
+        return self.__historicGPG
     
     def getTGPG(self):
         return self.__teamGoalsPerGame
@@ -58,6 +66,39 @@ class Player:
             "Team's Goals per Game" : self.__teamGoalsPerGame,
             "Other Team's Goals Against" : self.__otherTeamGoalsAgainst
         }
+    
+    def findHistoricGPG(self):
+
+        goals = 0
+        games = 0
+        acceptableSeasons = [20232024, 20222023, 20212022]
+        for season_data in self.__playerData['seasonTotals']:
+            if ((season_data['season'] in acceptableSeasons) and (season_data['leagueAbbrev'] == "NHL")):
+                try:
+
+                    tempGoals = season_data['goals']
+                    tempGames = season_data['gamesPlayed']
+
+                    goals += tempGoals
+                    games += tempGames
+                except:
+                    # weird
+                    pass
+
+        if games == 0:
+            return 0
+        
+        return goals/games
+
+
+    def findLast5GPG(self):
+
+        goals = 0
+        games = 5
+        for game_data in self.__playerData['last5Games']:
+            goals += game_data['goals']
+      
+        return goals/games
 
     def __init__(self, name, id, teamName, teamAbbr, teamId, otherTeamId, data):
         if (name == ""):
@@ -68,27 +109,23 @@ class Player:
         self.__teamId = teamId
         self.__otherTeamId = otherTeamId
 
-        if self.__playerID == -1:
-            # player's team (and id) could not be found
-            self.__stat = -1
-        else:
-            # calculates a player's goals per game
-            if (data):
-                self.__goalsPerGame = find_GPGP(self.getName(), data)
-            else:
-                self.__goalsPerGame = self.__getGPGP(self.__playerID)
+        url = f"https://api-web.nhle.com/v1/player/{id}/landing"
+        r = requests.get(url)
+        self.__playerData = r.json()
 
-            # teams goals per game
-            if self.__teamId in Player.teamStats:
-                self.__teamGoalsPerGame = Player.teamStats[self.__teamId]['gpg']
-                self.__otherTeamGoalsAgainst = Player.teamStats[self.__teamId]['ga']
-            else:
-                # Handle the case where the key is not present (e.g., set a default value)
-                self.__teamGoalsPerGame = 0  # You can change this to an appropriate default value
-                self.__otherTeamGoalsAgainst = 0
+        # calculates a player's goals per game
+        self.__goalsPerGame = find_GPGP(self.getName(), data)
+        self.__historicGPG = self.findHistoricGPG()
+        self.__5GPG = self.findLast5GPG()
+        
+        # teams goals per game
+        self.__teamGoalsPerGame = Player.teamStats[self.__teamId]['gpg']
+        
+        # other team goals against
+        self.__otherTeamGoalsAgainst = Player.teamStats[self.__teamId]['ga']
 
-            # stat
-            self.__stat = self.__calculateStat()
+        # stat
+        self.__stat = self.__calculateStat()
 
     def __calculateStat(self):
         # return (self.__goalsPerGame * self.__tgpg)
@@ -117,4 +154,4 @@ class Player:
     def __str__ (self):
         name_padding = 30
         stat_padding = 10
-        return "{:<{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(self.getName(), name_padding, "{:.2f}".format(float(self.__stat)), stat_padding, "{:.2f}".format(self.__goalsPerGame), stat_padding, "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding)
+        return "{:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(self.getName(), name_padding, "{:.2f}".format(float(self.__stat)), stat_padding, "{:.2f}".format(self.__goalsPerGame), stat_padding, "{:.2f}".format(self.__5GPG), stat_padding, "{:.2f}".format(self.__historicGPG), stat_padding, "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding)
