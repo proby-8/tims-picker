@@ -1,6 +1,8 @@
 import requests
 import json
 import pandas as pd
+import sys
+
 
 def find_GPGP(player_name, data):
     for player in data["skaters"]:
@@ -84,8 +86,6 @@ class Player:
                 # Handle the case where the key is not present (e.g., set a default value)
                 self.__teamGoalsPerGame = 0  # You can change this to an appropriate default value
                 self.__otherTeamGoalsAgainst = 0
-
-            # other team goals against
 
             # stat
             self.__stat = self.__calculateStat()
