@@ -105,7 +105,6 @@ class Player:
 
 
     def findLast5GPG(self):
-
         goals = 0
         games = 5
         for game_data in self.__playerData['last5Games']:
@@ -141,8 +140,13 @@ class Player:
         self.__stat = self.__calculateStat()
 
     def __calculateStat(self):
-        # return (self.__goalsPerGame * self.__tgpg)
-        return (self.__goalsPerGame * self.__teamGoalsPerGame * self.__otherTeamGoalsAgainst)
+        weights=(0.5, 0.1, 0.2, 0.2)
+
+        if sum(weights) != 1:
+            raise ValueError("Weights must add up to 1.")
+
+        overallStat = sum(w * stat for w, stat in zip(weights, [self.__goalsPerGame, self.__teamGoalsPerGame, self.__otherTeamGoalsAgainst, self.__5GPG]))
+        return overallStat
 
     # For comparison
     def __lt__(self, other):
