@@ -70,7 +70,7 @@ class Player:
         name_padding = 30
         stat_padding = 10
 
-        print ("\t{:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "5GPG", stat_padding, "HGPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding))   
+        print ("\t{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format("Player Name", name_padding, "Team Name", name_padding, "Stat", stat_padding, "GPG", stat_padding, "5GPG", stat_padding, "HGPG", stat_padding, "TGPG", stat_padding, "OTGA", stat_padding, "isHome", stat_padding))   
         print("") 
     
     def getFeatures(self):
@@ -111,15 +111,18 @@ class Player:
             goals += game_data['goals']
       
         return goals/games
+            
 
-    def __init__(self, name, id, teamName, teamAbbr, teamId, otherTeamId, data):
+    def __init__(self, name, id, teamName, teamAbbr, teamId, otherTeamId, isHome, data):
         if (name == ""):
             return
 
         self.__name = name
         self.__playerID = id
         self.__teamId = teamId
+        self.__teamName = teamName
         self.__otherTeamId = otherTeamId
+        self.__isHome = isHome
 
         url = f"https://api-web.nhle.com/v1/player/{id}/landing"
         r = requests.get(url)
@@ -171,4 +174,4 @@ class Player:
     def __str__ (self):
         name_padding = 30
         stat_padding = 10
-        return "{:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(self.getName(), name_padding, "{:.2f}".format(float(self.__stat)), stat_padding, "{:.2f}".format(self.__goalsPerGame), stat_padding, "{:.2f}".format(self.__5GPG), stat_padding, "{:.2f}".format(self.__historicGPG), stat_padding, "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding)
+        return "{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(self.getName(), name_padding, self.getTeamName(), name_padding, "{:.2f}".format(float(self.__stat)), stat_padding, "{:.2f}".format(self.__goalsPerGame), stat_padding, "{:.2f}".format(self.__5GPG), stat_padding, "{:.2f}".format(self.__historicGPG), stat_padding, "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding, "{:d}".format(self.__isHome), stat_padding)

@@ -43,13 +43,15 @@ def getTeams(data, target_date):
                     'name': (game["homeTeam"]["placeName"]["default"]),
                     'abbr': (game["homeTeam"]["abbrev"]),
                     'id': (game['homeTeam']['id']),
-                    'otherId': (game['awayTeam']['id'])
+                    'otherId': (game['awayTeam']['id']),
+                    'home': 1
                 }
                 teamInfoAway = {
                     'name': (game["awayTeam"]["placeName"]["default"]),
                     'abbr': (game["awayTeam"]["abbrev"]),
                     'id': (game['awayTeam']['id']),
-                    'otherId': (game['homeTeam']['id'])
+                    'otherId': (game['homeTeam']['id']),
+                    'home': 0
                 }
 
                 teams.append(teamInfoHome)
@@ -69,7 +71,7 @@ def getPlayersFromTeam(team):
     data = r.json()    
 
     for player in roster:
-        allPlayers.append(Player.Player(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], data))
+        allPlayers.append(Player.Player(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], team['home'], data))
 
     return allPlayers
 
