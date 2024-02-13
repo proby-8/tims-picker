@@ -60,7 +60,7 @@ def getTeams(data, target_date):
     return teams
 
 def getPlayersFromTeam(team):
-    Player.Player.initTeamStats(team['id'])
+    Player.Player.initTeamStats(team['id'], team['otherId'])
     allPlayers = []
 
     roster = getRoster(team['abbr'])

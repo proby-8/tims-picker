@@ -58,18 +58,29 @@ class Player:
         return self.__teamId
     
     @classmethod
-    def initTeamStats( cls, teamId ):
+    def initTeamStats( cls, teamId, otherTeamId ):
         url = f"https://api.nhle.com/stats/rest/en/team/summary?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
         r = requests.get(url)
         data = r.json()
 
+        url2 = f"https://api.nhle.com/stats/rest/en/team/penaltykilltime?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
+        r2 = requests.get(url2)
+        data2 = r2.json()
+
         for team in data["data"]:
-            if (teamId == team['teamId'] or (teamId == -1)):
-                cls.teamStats[teamId] = {
+            if (teamId == team['teamId'] or otherTeamId == team['teamId']):
+                cls.teamStats[team['teamId']] = {
                                             "gpg" : team["goalsForPerGame"],
                                             "ga"  : team['goalsAgainstPerGame']
                                         }
-                
+
+        for team in data2["data"]:
+            if (teamId == team['teamId'] or otherTeamId == team['teamId']):
+                cls.teamStats[team['teamId']].update({
+                                            "pm" : team["timeOnIceShorthanded"]
+                                        })
+
+
     @classmethod
     def printHeader ( cls ):
         print("\nPlayers in order:")
@@ -77,14 +88,15 @@ class Player:
         name_padding = 30
         stat_padding = 10
 
-        print("\t{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
+        print("\t{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
             "Player Name", name_padding,
             "Team Name", name_padding,
             "Stat", stat_padding,
             "GPG", stat_padding,
             "5GPG", stat_padding,
             "HGPG", stat_padding,
-            "PPG", stat_padding,
+            "HPPG", stat_padding,
+            "OTPM", stat_padding,
             "TGPG", stat_padding,
             "OTGA", stat_padding,
             "isHome", stat_padding
@@ -100,21 +112,25 @@ class Player:
     
     def findHistoricGPG(self):
 
+        ppg = 0
         goals = 0
         games = 0
         acceptableSeasons = [20232024, 20222023, 20212022]
         for season_data in self.__playerData['seasonTotals']:
             if ((season_data['season'] in acceptableSeasons) and (season_data['leagueAbbrev'] == "NHL")):
                 try:
-
+                    tempPPG = season_data['powerPlayGoals']
                     tempGoals = season_data['goals']
                     tempGames = season_data['gamesPlayed']
 
+                    ppg += tempPPG
                     goals += tempGoals
                     games += tempGames
                 except:
                     # weird
                     pass
+
+        self.__PPG = ppg
 
         if games == 0:
             return 0
@@ -125,9 +141,12 @@ class Player:
     def findLast5GPG(self):
         goals = 0
         games = 5
-        for game_data in self.__playerData['last5Games']:
-            goals += game_data['goals']
-      
+        try:
+            for game_data in self.__playerData['last5Games']:
+                goals += game_data['goals']
+        except KeyError:
+            return 0
+            
         return goals/games
             
 
@@ -144,31 +163,29 @@ class Player:
         self.__teamId = teamId
         self.__teamName = teamName
         self.__otherTeamId = otherTeamId
-        self.__isHome = isHome
 
-        # calculates a player's goals per game
+        self.__isHome = isHome
         self.__goalsPerGame = find_GPGP(self.getName(), data)
         self.__historicGPG = self.findHistoricGPG()
-        self.__PPG = find_PPG(self.getName(), data)
+        # self.__PPG = find_PPG(self.getName(), data)
         self.__5GPG = self.findLast5GPG()
         
         # teams goals per game
         self.__teamGoalsPerGame = Player.teamStats[self.__teamId]['gpg']
         
         # other team goals against
-        self.__otherTeamGoalsAgainst = Player.teamStats[self.__teamId]['ga']
+        self.__otherTeamGoalsAgainst = Player.teamStats[self.__otherTeamId]['ga']
 
+        self.__OTPM = Player.teamStats[self.__otherTeamId]['pm']
+        
         # stat
         self.__stat = self.__calculateStat()
 
     def __calculateStat(self):
         weights=(0.5, 0.25, 0.2, 0.05)
-
         if sum(weights) != 1:
             raise ValueError("Weights must add up to 1.")
         
-        # gpg, last 5 gpg, ga, home/away, 
-
         overallStat = sum(w * stat for w, stat in zip(weights, [self.__goalsPerGame, self.__5GPG, self.__otherTeamGoalsAgainst, self.__isHome]))
         return overallStat
 
@@ -190,12 +207,29 @@ class Player:
 
     def __ge__(self, other):
         return self.__stat >= other.__stat
+    
+    def toCSV(self):
+        csv_format = "{},{},{},{},{},{},{},{},{},{},{}".format(
+            self.getName(),
+            self.getTeamName(),
+            "{:.2f}".format(float(self.__stat)),
+            "{:.2f}".format(self.__goalsPerGame),
+            "{:.2f}".format(self.__5GPG),
+            "{:.2f}".format(self.__historicGPG),
+            "{:.2f}".format(self.__PPG),
+            "{:d}".format(self.__OTPM),
+            "{:.2f}".format(self.__teamGoalsPerGame),
+            "{:.2f}".format(self.__otherTeamGoalsAgainst),
+            "{:d}".format(self.__isHome)
+        )
+        return csv_format+"\n"
+
 
     # to string method
     def __str__ (self):
         name_padding = 30
         stat_padding = 10
-        return "{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
+        return "{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
             self.getName(), name_padding, 
             self.getTeamName(), name_padding, 
             "{:.2f}".format(float(self.__stat)), stat_padding, 
@@ -203,6 +237,7 @@ class Player:
             "{:.2f}".format(self.__5GPG), stat_padding, 
             "{:.2f}".format(self.__historicGPG), stat_padding, 
             "{:.2f}".format(self.__PPG), stat_padding, 
+            "{:d}".format(self.__OTPM), stat_padding,
             "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, 
             "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding, 
             "{:d}".format(self.__isHome), stat_padding
