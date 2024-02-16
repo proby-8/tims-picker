@@ -70,6 +70,43 @@ def createNewModel():
     model.save("savedAiModel")
 
 
+def createNewModel2():
+    dataset = pd.read_csv("lib\\data.csv")
+
+    # Separate features and labels
+    labels = dataset.pop("Scored")
+    dates = dataset.pop("Date")
+    names = dataset.pop("Name")
+    features = dataset
+
+    # Split the data into training and testing sets
+    totalDates = dates.unique()
+
+    train_size = totalDates.size
+
+    train_features = np.asarray(features).astype('float32')
+    train_labels = labels
+
+    # Create TensorFlow datasets
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels)).batch(1)
+
+    # Define and compile the model
+    model = tf.keras.models.Sequential([tf.keras.layers.Dense(1)])
+    optimizer = tf.keras.optimizers.Adagrad(learning_rate=0.05)
+
+    model.compile(optimizer=optimizer, loss="mse", metrics=['mae'])
+
+    # Train the model
+    numEpochs = int(input("Enter number of epochs: "))
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, restore_best_weights=True)
+    model.fit(train_dataset, epochs=numEpochs, callbacks=[early_stopping])
+
+    model.fit(train_dataset, epochs=numEpochs)  # Adjust the number of epochs as needed
+
+    # save the model
+    model.save("savedAiModel")
+
+
 def test(createNew):
 
     if (createNew):
@@ -108,6 +145,8 @@ def test(createNew):
 
     # Print the sorted list
     Player.printHeader()
+    i=1
     for player_info in sorted_playersAI:
         player_info['player'].setStat(player_info['predictVal'])
-        print(f"\t{player_info['player']}")
+        print(f"{i}\t{player_info['player']}")
+        i+=1

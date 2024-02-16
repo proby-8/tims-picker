@@ -112,8 +112,10 @@ def rank():
     allPlayers = sorted(allPlayers, reverse=True)
 
     Player.Player.printHeader()
+    i=1
     for player in allPlayers:
-        print(f"\t{player}")
+        print(f"{i}\t{player}")
+        i+=1
 
 if __name__ == "__main__":
     rank()

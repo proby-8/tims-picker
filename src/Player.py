@@ -29,6 +29,12 @@ class Player:
     
     def setStat(self, stat):
         self.__stat = stat
+
+    def setBet(self, bet):
+        self.__bet = bet
+
+    def getBet(self):
+        return self.__bet
     
     def getName(self):
         return self.__name
@@ -88,9 +94,10 @@ class Player:
         name_padding = 30
         stat_padding = 10
 
-        print("\t{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
+        print("\t{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
             "Player Name", name_padding,
-            "Team Name", name_padding,
+            "Team Name", stat_padding,
+            "Bet", stat_padding,
             "Stat", stat_padding,
             "GPG", stat_padding,
             "5GPG", stat_padding,
@@ -163,6 +170,7 @@ class Player:
         self.__teamId = teamId
         self.__teamName = teamName
         self.__otherTeamId = otherTeamId
+        self.__bet = '0'
 
         self.__isHome = isHome
         self.__goalsPerGame = find_GPGP(self.getName(), data)
@@ -209,10 +217,12 @@ class Player:
         return self.__stat >= other.__stat
     
     def toCSV(self):
-        csv_format = "{},{},{},{},{},{},{},{},{},{},{}".format(
+        csv_format = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
+            ' ',
             self.getName(),
+            self.getId(),
             self.getTeamName(),
-            "{:.2f}".format(float(self.__stat)),
+            "{:s}".format(self.__bet),
             "{:.2f}".format(self.__goalsPerGame),
             "{:.2f}".format(self.__5GPG),
             "{:.2f}".format(self.__historicGPG),
@@ -223,15 +233,36 @@ class Player:
             "{:d}".format(self.__isHome)
         )
         return csv_format+"\n"
+    
+    @classmethod
+    def headerToCSV(self):
+        csv_format = "{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
+            "Data",
+            "Scored",
+            "Name",
+            "ID",
+            "Team",
+            "Bet",
+            "GPG",
+            "Last 5 GPG",
+            "HGPG",
+            "PPG",
+            "OTPM",
+            "TGPG",
+            "OTGA",
+            "Home (1)"
+        )
+        return csv_format+"\n"
 
 
     # to string method
     def __str__ (self):
         name_padding = 30
         stat_padding = 10
-        return "{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
+        return "{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
             self.getName(), name_padding, 
-            self.getTeamName(), name_padding, 
+            self.getTeamName(), stat_padding, 
+            "{:s}".format(self.__bet), stat_padding, 
             "{:.2f}".format(float(self.__stat)), stat_padding, 
             "{:.2f}".format(self.__goalsPerGame), stat_padding, 
             "{:.2f}".format(self.__5GPG), stat_padding, 
