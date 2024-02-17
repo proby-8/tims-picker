@@ -273,3 +273,19 @@ class Player:
             "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding, 
             "{:d}".format(self.__isHome), stat_padding
         )
+    
+    def toJSON(self):
+        return {
+            'name': str(self.getName()),
+            'team_name': str(self.__teamName),  # Assuming __teamName is a string
+            'bet': float(self.__bet),           # Casting to float
+            'stat': float(self.__stat),           # Casting to int
+            'goals_per_game': float(self.__goalsPerGame),
+            'five_gpg': float(self.__5GPG),
+            'historic_gpg': float(self.__historicGPG),
+            'ppg': float(self.__PPG),
+            'otpm': float(self.__OTPM),
+            'team_goals_per_game': float(self.__teamGoalsPerGame),
+            'other_team_goals_against': float(self.__otherTeamGoalsAgainst),
+            'is_home': int(self.__isHome)      # Assuming __isHome is boolean
+        }

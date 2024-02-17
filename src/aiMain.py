@@ -107,7 +107,7 @@ def createNewModel2():
     model.save("savedAiModel")
 
 
-def test(createNew):
+def test(createNew, print=True):
 
     if (createNew):
         createNewModel()
@@ -148,5 +148,8 @@ def test(createNew):
     i=1
     for player_info in sorted_playersAI:
         player_info['player'].setStat(player_info['predictVal'])
-        print(f"{i}\t{player_info['player']}")
+        if print:
+            print(f"{i}\t{player_info['player']}")
         i+=1
+
+    return sorted_playersAI
