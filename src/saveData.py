@@ -1,6 +1,7 @@
 import datetime
 import os
 import requests
+import csv
 
 import Player
 import allPlayers
@@ -78,7 +79,16 @@ def getGoalScorers(date):
     return goalScorers
 
 
+def inList(id, listIds):
+    for lId in listIds:
+        if str(id) == str(lId):
+            return True
+    
+    return False
+
 def updateGoalScorers():
+
+    print("\nUpdating goal scorers")
 
     # get yesterday
     today = datetime.datetime.now()
@@ -87,19 +97,24 @@ def updateGoalScorers():
 
     goalScorers = getGoalScorers(date)
 
+    player_ids = [player['player_id'] for player in goalScorers]
+
     if os.path.isfile('lib/data.csv'):
         with open('lib/data.csv', 'r') as file:
-            # Read the first line to check the date
+            reader = csv.reader(file)
+            header = next(reader)  # Read the header line
+            rows = list(reader)  # Read the remaining rows into a list of lists
 
-            while 1:
-                curLine = file.readline().strip().split(',')
-                # Check if the date matches the current date
-                if curLine[0] == date:
-                    if curLine[1] == ' ':
-                        # check if player scored
-                        if curLine[3] in goalScorers:
-                            curLine[1] = 1
+        with open('lib/data.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(header)  # Write back the header line
+            
+            for row in rows:
+                if row[0] == date:
+                    if (row[1] not in {0,1}):
+                        # Check if player scored
+                        if (inList(row[3], player_ids)):
+                            row[1] = '1'
                         else:
-                            curLine[1] = 0
-                else:
-                    break
+                            row[1] = '0'
+                writer.writerow(row)
