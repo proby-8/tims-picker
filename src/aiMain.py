@@ -144,7 +144,8 @@ def test(createNew, print=True):
     sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
 
     # Print the sorted list
-    Player.printHeader()
+    if print:
+        Player.printHeader()
     i=1
     for player_info in sorted_playersAI:
         player_info['player'].setStat(player_info['predictVal'])
