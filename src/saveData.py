@@ -24,10 +24,11 @@ def save():
     # Check if the file exists
     if os.path.isfile('lib/data.csv'):
         with open('lib/data.csv', 'r') as file:
-            # Read the first line to check the date
-            first_line = file.readline().strip().split(',')[0]
-            # Check if the date matches the current date
-            if first_line != currentDate:
+            lines = file.readlines()
+            last_line = lines[-1].strip().split(',')[0]
+
+            if last_line != currentDate:
+                print("Writing")
                 with open('lib/data.csv', 'a') as fd:
                     for player in players:
                         fd.write(f"{currentDate},")
@@ -41,18 +42,26 @@ def save():
                 fd.write(player.toCSV())
 
 
+def compareNames(name1, name2):
+    name1 = str(name1).lower().replace(" ", "")
+    name2 = str(name2).lower().replace(" ", "")
+
+    if name1 == name2:
+        return True
+    return False
+
+
 def linker(players, playerInfo):
     for player in playerInfo:
         matchFound = 0
         # could change to sort and binary search, but only takes 0.00001 seconds anyways
         for playerData in players:
-            if player['name'] == playerData.getName():
+            if compareNames(player['name'], playerData.getName()):
                 matchFound = 1
                 playerData.setBet(player['bet'])
         
         if (not matchFound):
             print(f"Could not find - Player: {player['name']}, Bet: {player['bet']}")
-
 
 def getGoalScorers(date):
     url = f"https://api-web.nhle.com/v1/score/{date}"
