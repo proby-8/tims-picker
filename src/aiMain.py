@@ -20,7 +20,7 @@ def aiGuess():
         choice = int(input("Would you like to use the saved AI model (0), or generate a new one (1): "))
     
     if (choice != 0):
-        verification = int(input("Are you sure you want to create a new model?\n(0) to use saved, (1) to create new: "))
+        verification = int(input("Are you sure you want to create a new model?\n(0) to cancel, (1) to create new: "))
         if (verification != 1):
             choice = 0
 
@@ -71,49 +71,61 @@ def createNewModel():
 
 
 def createNewModel2():
-    dataset = pd.read_csv("lib\\data.csv")
+
+    # Load the dataset
+    dataset = pd.read_csv("lib/data.csv")
+
+    # Filter out rows with non-numeric or empty values in the 'Scored' column
+    dataset = dataset[pd.to_numeric(dataset['Scored'], errors='coerce').notna()]
+
+    # Convert 'Scored' column to numeric
+    dataset['Scored'] = pd.to_numeric(dataset['Scored'], errors='coerce')
+
+    # Drop rows with NaN values
+    dataset = dataset.dropna(subset=['Scored'])
 
     # Separate features and labels
-    labels = dataset.pop("Scored")
+    labels = dataset.pop("Scored").astype('float32')
     dates = dataset.pop("Date")
     names = dataset.pop("Name")
-    features = dataset
+    teams = dataset.pop("Team")
+    ids = dataset.pop("ID")
+    # bets = dataset.pop("Bet")
+    features = dataset.astype('float32')
 
     # Split the data into training and testing sets
-    totalDates = dates.unique()
-
-    train_size = totalDates.size
-
-    train_features = np.asarray(features).astype('float32')
-    train_labels = labels
+    train_size = int(0.8 * len(features))
+    train_features, test_features = features[:train_size], features[train_size:]
+    train_labels, test_labels = labels[:train_size], labels[train_size:]
 
     # Create TensorFlow datasets
-    train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels)).batch(1)
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_features.values, train_labels.values)).batch(1)
 
     # Define and compile the model
     model = tf.keras.models.Sequential([tf.keras.layers.Dense(1)])
     optimizer = tf.keras.optimizers.Adagrad(learning_rate=0.05)
-
     model.compile(optimizer=optimizer, loss="mse", metrics=['mae'])
 
     # Train the model
-    numEpochs = int(input("Enter number of epochs: "))
+    num_epochs = int(input("Enter number of epochs: "))
     early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, restore_best_weights=True)
-    model.fit(train_dataset, epochs=numEpochs, callbacks=[early_stopping])
+    model.fit(train_dataset, epochs=num_epochs, callbacks=[early_stopping])
 
-    model.fit(train_dataset, epochs=numEpochs)  # Adjust the number of epochs as needed
+    # Evaluate the model on the test set
+    test_loss, test_mae = model.evaluate(test_features.values, test_labels.values)
+    print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
-    # save the model
-    model.save("savedAiModel")
+    # Save the model
+    model.save("newAiModel")
 
 
-def test(createNew, print=True):
+def test(createNew, display=True):
 
     if (createNew):
-        createNewModel()
+        createNewModel2()
 
     # load the model
-    model = tf.keras.models.load_model("savedAiModel")
+    model = tf.keras.models.load_model("newAiModel")
 
     # get today's players
     players = allPlayers.getAllPlayers()
@@ -144,12 +156,12 @@ def test(createNew, print=True):
     sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
 
     # Print the sorted list
-    if print:
+    if display:
         Player.printHeader()
     i=1
     for player_info in sorted_playersAI:
         player_info['player'].setStat(player_info['predictVal'])
-        if print:
+        if display:
             print(f"{i}\t{player_info['player']}")
         i+=1
 

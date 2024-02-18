@@ -112,9 +112,14 @@ class Player:
     
     def getFeatures(self):
         return {
-            'Goals per Game' : self.__goalsPerGame,
-            "Team's Goals per Game" : self.__teamGoalsPerGame,
-            "Other Team's Goals Against" : self.__otherTeamGoalsAgainst
+            'GPG' : self.__goalsPerGame,
+            "Last 5 GPG" : self.__5GPG,
+            "HGPG": self.__historicGPG,
+            "PPG": self.__PPG,
+            "OTPM": self.__OTPM,
+            "TGPG": self.__teamGoalsPerGame,
+            "OTGA" : self.__otherTeamGoalsAgainst,
+            "Home (1)" : self.__isHome
         }
     
     def findHistoricGPG(self):
