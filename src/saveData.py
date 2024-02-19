@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import requests
 import csv
@@ -63,29 +64,55 @@ def linker(players, playerInfo):
         if (not matchFound):
             print(f"Could not find - Player: {player['name']}, Bet: {player['bet']}")
 
+
+def get_players(game_data):
+    players = []
+    
+    # Extract players from both away and home teams
+    for team in ['awayTeam', 'homeTeam']:
+        for player_type in ['forwards', 'defense']:
+            for player in game_data['playerByGameStats'][team][player_type]:
+                player_info = {
+                    'playerId': player['playerId'],
+                    'name': player['name']['default'],
+                    'toi': player['toi'],
+                    'goals': player['goals']
+                }
+                players.append(player_info)
+    
+    return players
+
+
 def getGoalScorers(date):
     url = f"https://api-web.nhle.com/v1/score/{date}"
 
     r = requests.get(url)
     json_data = r.json()
 
-    goalScorers = []
+    # goalScorers = []
+    playersWhoPlayed = []
     
     # Parse through each game
     for game in json_data['games']:
         # Parse through each goal in the game
-        for goal in game['goals']:
-            scorer_info = {
-                'player_id': goal['playerId'],
-                'player_name': goal['name']['default'],
-                'team_abbrev': goal['teamAbbrev'],
-                'time': goal['timeInPeriod'],
-                'period': goal['period'],
-                'strength': goal['strength']
-            }
-            goalScorers.append(scorer_info)
+        url = f"https://api-web.nhle.com/v1/gamecenter/{game['id']}/boxscore"
+        r = requests.get(url)
+        newData = r.json()
 
-    return goalScorers
+        playersWhoPlayed += get_players(newData['boxscore'])
+
+        # for goal in game['goals']:
+        #     scorer_info = {
+        #         'player_id': goal['playerId'],
+        #         'player_name': goal['name']['default'],
+        #         'team_abbrev': goal['teamAbbrev'],
+        #         'time': goal['timeInPeriod'],
+        #         'period': goal['period'],
+        #         'strength': goal['strength']
+        #     }
+        #     goalScorers.append(scorer_info)
+
+    return playersWhoPlayed
 
 
 def inList(id, listIds):
@@ -94,6 +121,15 @@ def inList(id, listIds):
             return True
     
     return False
+
+def findMatch(id, players):
+    matching_player = None
+    for player in players:
+        if str(player['playerId']) == str(id):
+            matching_player = player
+            break  # Stop the loop once a match is found
+
+    return matching_player
 
 def updateGoalScorers():
 
@@ -104,9 +140,7 @@ def updateGoalScorers():
     yesterday = today - datetime.timedelta(days=1)
     date = yesterday.strftime('%Y-%m-%d')
 
-    goalScorers = getGoalScorers(date)
-
-    player_ids = [player['player_id'] for player in goalScorers]
+    playersWhoPlayed = getGoalScorers(date)
 
     if os.path.isfile('lib/data.csv'):
         with open('lib/data.csv', 'r') as file:
@@ -120,10 +154,22 @@ def updateGoalScorers():
             
             for row in rows:
                 if row[0] == date:
-                    if (row[1] not in {0,1}):
-                        # Check if player scored
-                        if (inList(row[3], player_ids)):
-                            row[1] = '1'
-                        else:
-                            row[1] = '0'
-                writer.writerow(row)
+
+                    # for each row in correct date
+                    match = findMatch(row[3], playersWhoPlayed)
+
+                    # if not match, remove from csv as they did not play
+                    if match:
+                        if (row[1] not in {0,1}):
+                            # Check if player scored
+
+                            if (match['goals'] > 0):
+                                row[1] = '1'
+                            else:
+                                row[1] = '0'
+                        writer.writerow(row)
+                 
+                else:
+                    writer.writerow(row)
+
+updateGoalScorers()
