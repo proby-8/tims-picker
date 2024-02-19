@@ -10,9 +10,11 @@ import os
 import numpy as np
 import pandas as pd
 import time
+from sklearn.discriminant_analysis import StandardScaler
 import tensorflow as tf
 from Player import Player
 import allPlayers
+import saveData
 
 def aiGuess():
     choice = 1
@@ -93,31 +95,38 @@ def createNewModel2():
     # bets = dataset.pop("Bet")
     features = dataset.astype('float32')
 
+    # Normalize features using StandardScaler
+    scaler = StandardScaler()
+    features_scaled = scaler.fit_transform(features)
+    
     # Split the data into training and testing sets
-    train_size = int(0.8 * len(features))
-    train_features, test_features = features[:train_size], features[train_size:]
+    train_size = int(0.8 * len(features_scaled))
+    train_features, test_features = features_scaled[:train_size], features_scaled[train_size:]
     train_labels, test_labels = labels[:train_size], labels[train_size:]
 
     # Create TensorFlow datasets
-    train_dataset = tf.data.Dataset.from_tensor_slices((train_features.values, train_labels.values)).batch(1)
-
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels)).batch(1)
+    
+    input_shape = train_features.shape[1]
     # Define and compile the model
-    model = tf.keras.models.Sequential([tf.keras.layers.Dense(1)])
-    optimizer = tf.keras.optimizers.Adagrad(learning_rate=0.05)
-    model.compile(optimizer=optimizer, loss="mse", metrics=['mae'])
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(64, activation='relu', input_shape=(input_shape,)),
+        tf.keras.layers.Dense(32, activation='relu'),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+
+    model.compile(optimizer=optimizer, loss="binary_crossentropy", metrics=['accuracy'])
 
     # Train the model
     num_epochs = int(input("Enter number of epochs: "))
-    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, restore_best_weights=True)
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5, restore_best_weights=True)
     model.fit(train_dataset, epochs=num_epochs, callbacks=[early_stopping])
-
-    # Evaluate the model on the test set
-    test_loss, test_mae = model.evaluate(test_features.values, test_labels.values)
-    print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
     # Save the model
     model.save("newAiModel")
-
+    
 
 def test(createNew, display=True):
 
@@ -129,6 +138,10 @@ def test(createNew, display=True):
 
     # get today's players
     players = allPlayers.getAllPlayers()
+
+    playerInfo = saveData.oddsScraper.scraper()
+
+    saveData.linker(players, playerInfo)
 
     playersAI = []
 

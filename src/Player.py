@@ -112,6 +112,7 @@ class Player:
     
     def getFeatures(self):
         return {
+            'Bet': self.__bet,
             'GPG' : self.__goalsPerGame,
             "Last 5 GPG" : self.__5GPG,
             "HGPG": self.__historicGPG,
@@ -268,7 +269,7 @@ class Player:
             self.getName(), name_padding, 
             self.getTeamName(), stat_padding, 
             "{:s}".format(self.__bet), stat_padding, 
-            "{:.2f}".format(float(self.__stat)), stat_padding, 
+            "{:.10f}".format(float(self.__stat)), stat_padding, 
             "{:.2f}".format(self.__goalsPerGame), stat_padding, 
             "{:.2f}".format(self.__5GPG), stat_padding, 
             "{:.2f}".format(self.__historicGPG), stat_padding, 

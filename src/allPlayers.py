@@ -1,6 +1,5 @@
 import datetime
 from itertools import chain
-import time
 import requests
 from multiprocessing import Pool
 
@@ -68,7 +67,7 @@ def getPlayersFromTeam(team):
 
     url = f"https://api-web.nhle.com/v1/club-stats/{team['abbr']}/20232024/2"
     r = requests.get(url)
-    data = r.json()    
+    data = r.json()
 
     for player in roster:
         allPlayers.append(Player.Player(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], team['home'], data))
@@ -86,9 +85,8 @@ def getPlayers(teams):
     return allPlayers
 
 def getAllPlayers():
-    # currently testing during all-star week
-    # target_date = "2024-01-26"
     target_date = datetime.date.today().strftime('%Y-%m-%d')
+    # target_date = "2024-02-19"
 
     URL = f"https://api-web.nhle.com/v1/schedule/{target_date}"
 
