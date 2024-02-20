@@ -18,8 +18,13 @@ def scraper( league="NHL"):
                 dk_markets = i['offerSubcategoryDescriptors']
 
     subcategoryIds = []# Need subcategoryIds first
-    for i in dk_markets:
-        subcategoryIds.append(i['subcategoryId'])
+
+    try:
+        for i in dk_markets:
+            subcategoryIds.append(i['subcategoryId'])
+    except UnboundLocalError:
+        print("No Goalscorer bets on Draftkings")
+        return
 
     for ids in subcategoryIds:
         print("\nGathering odds...\n")

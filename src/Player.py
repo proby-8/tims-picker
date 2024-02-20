@@ -112,7 +112,7 @@ class Player:
     
     def getFeatures(self):
         return {
-            'Bet': self.__bet,
+            # 'Bet': self.__bet,
             'GPG' : self.__goalsPerGame,
             "Last 5 GPG" : self.__5GPG,
             "HGPG": self.__historicGPG,
@@ -229,13 +229,13 @@ class Player:
             self.getId(),
             self.getTeamName(),
             "{:s}".format(self.__bet),
-            "{:.2f}".format(self.__goalsPerGame),
-            "{:.2f}".format(self.__5GPG),
-            "{:.2f}".format(self.__historicGPG),
-            "{:.2f}".format(self.__PPG),
+            "{:f}".format(self.__goalsPerGame),
+            "{:f}".format(self.__5GPG),
+            "{:f}".format(self.__historicGPG),
+            "{:f}".format(self.__PPG),
             "{:d}".format(self.__OTPM),
-            "{:.2f}".format(self.__teamGoalsPerGame),
-            "{:.2f}".format(self.__otherTeamGoalsAgainst),
+            "{:f}".format(self.__teamGoalsPerGame),
+            "{:f}".format(self.__otherTeamGoalsAgainst),
             "{:d}".format(self.__isHome)
         )
         return csv_format+"\n"
