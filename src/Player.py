@@ -112,14 +112,14 @@ class Player:
     
     def getFeatures(self):
         return {
-            # 'Bet': self.__bet,
             'GPG' : self.__goalsPerGame,
+            "TGPG": self.__teamGoalsPerGame,
+            "OTGA" : self.__otherTeamGoalsAgainst,
+            'Bet': self.__bet,
             "Last 5 GPG" : self.__5GPG,
             "HGPG": self.__historicGPG,
             "PPG": self.__PPG,
             "OTPM": self.__OTPM,
-            "TGPG": self.__teamGoalsPerGame,
-            "OTGA" : self.__otherTeamGoalsAgainst,
             "Home (1)" : self.__isHome
         }
     

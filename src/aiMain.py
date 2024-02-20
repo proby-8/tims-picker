@@ -52,17 +52,15 @@ def experimentalTest(createNew, display=True):
     all_features = [list(player.getFeatures().values()) for player in players]
     all_features = np.array(all_features, dtype='float32')
 
-    columns_to_keep = ["GPG", "TGPG", "OTGA"]
-
     # Reshape for model input
     all_features_reshaped = all_features.reshape(len(players), -1)
 
     # Make predictions for all players at once
-    predictions = model.predict(all_features_reshaped, verbose=0)
+    probabilities = model.predict(all_features_reshaped, verbose=0)
 
     # Access individual predictions as needed
     for i, player in enumerate(players):
-        prediction = predictions[i][0]
+        prediction = probabilities[i][0]
         # Rest of your code
         playerInfo = {
             'player': player,
@@ -106,13 +104,14 @@ def experimentalModel():
     try:
         dataset.pop("ID")
         dataset.pop("Team")
-        dataset.pop("Bet")
-    #     dataset.pop("Last 5 GPG")
-    #     dataset.pop("HGPG")
-    #     dataset.pop("PPG")
-    #     dataset.pop("OTPM")
-    #     dataset.pop("Home (1)")
+        # dataset.pop("Bet")
+        # dataset.pop("Last 5 GPG")
+        # dataset.pop("HGPG")
+        # dataset.pop("PPG")
+        # dataset.pop("OTPM")
+        # dataset.pop("Home (1)")
     except Exception:
+        print("Failed to pop data")
         pass
 
     features = dataset
@@ -126,16 +125,21 @@ def experimentalModel():
     train_labels = labels.values.astype('float32')
 
     # Create TensorFlow datasets
-    train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels)).batch(1)
+    from sklearn.utils import class_weight
+    class_weights = class_weight.compute_sample_weight('balanced', train_labels)
 
-    model = tf.keras.models.Sequential([tf.keras.layers.Dense(1)])
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels, class_weights)).batch(1)
+
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
     optimizer = tf.keras.optimizers.Adagrad(learning_rate=0.05)
 
-    model.compile(optimizer=optimizer, loss="mse", metrics=['mae'])
+    model.compile(optimizer=optimizer, loss=tf.keras.losses.BinaryCrossentropy(), metrics=['accuracy'])
     # Train the model
     numEpochs = int(input("Enter number of epochs: "))
 
-    model.fit(train_dataset, epochs=numEpochs)  # Adjust the number of epochs as needed
+    model.fit(train_dataset, epochs=numEpochs)
 
     # save the model
     model.save("savedAiModel")
