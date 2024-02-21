@@ -8,10 +8,14 @@
 
 import os
 import numpy as np
-import pandas as pd
 import time
-from sklearn.discriminant_analysis import StandardScaler
+import pandas as pd
 import tensorflow as tf
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from keras.layers import Input, Dense
+from keras.models import Model
+
 from Player import Player
 import allPlayers
 import saveData
@@ -37,12 +41,12 @@ def experimentalTest(createNew, display=True):
         experimentalModel()
 
     # load the model
-    model = tf.keras.models.load_model("savedAiModel")
+    model = tf.keras.models.load_model("randomModel")
 
     # get today's players
     players = allPlayers.getAllPlayers()
 
-    playerInfo = saveData.oddsScraper.scraper()
+    playerInfo = saveData.oddsScraper.scraper() 
 
     saveData.linker(players, playerInfo)
 
@@ -72,6 +76,7 @@ def experimentalTest(createNew, display=True):
     sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
 
     # Print the sorted list
+    display = True
     if display:
         Player.printHeader()
     i=1
@@ -86,60 +91,53 @@ def experimentalTest(createNew, display=True):
 
 
 def experimentalModel():
-    dataset = pd.read_csv("lib\\data.csv")
+    # Load the data
+    data = pd.read_csv('lib/test.csv')
 
-    # Filter out rows with non-numeric or empty values in the 'Scored' column
-    dataset = dataset[pd.to_numeric(dataset['Scored'], errors='coerce').notna()]
+    # Drop the rows where 'Scored' is empty
+    data = data[data['Scored'] != ' ']
+    for col in data.columns:
+        data[col] = pd.to_numeric(data[col], errors='coerce')
 
-    # Convert 'Scored' column to numeric
-    dataset['Scored'] = pd.to_numeric(dataset['Scored'], errors='coerce')
-
-    # Drop rows with NaN values
-    dataset = dataset.dropna(subset=['Scored'])
-
-    # Separate features and labels
-    labels = dataset.pop("Scored")
-    dates = dataset.pop("Date")
-    names = dataset.pop("Name")
-    try:
-        dataset.pop("ID")
-        dataset.pop("Team")
-        # dataset.pop("Bet")
-        # dataset.pop("Last 5 GPG")
-        # dataset.pop("HGPG")
-        # dataset.pop("PPG")
-        # dataset.pop("OTPM")
-        # dataset.pop("Home (1)")
-    except Exception:
-        print("Failed to pop data")
-        pass
-
-    features = dataset
-
+    # Preprocess the data
+    features = data[["GPG", "TGPG", "OTGA"]]
+    # features = data[['Bet','GPG','Last 5 GPG','HGPG','PPG','OTPM','TGPG','OTGA','Home (1)']]
+    labels = data['Scored']
+    
     # Split the data into training and testing sets
-    totalDates = dates.unique()
+    X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
+    
+    # Normalize the data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
-    train_size = totalDates.size
+    # Define the input shape
+    input_shape = (X_train.shape[1],)
+    inputs = Input(shape=input_shape)
 
-    train_features = np.asarray(features).astype('float32')
-    train_labels = labels.values.astype('float32')
+    # Define the layers
+    x = Dense(64, activation='relu')(inputs)
+    x = Dense(64, activation='relu')(x)
+    outputs = Dense(1, activation='sigmoid')(x)
 
-    # Create TensorFlow datasets
-    from sklearn.utils import class_weight
-    class_weights = class_weight.compute_sample_weight('balanced', train_labels)
+    # Create the model
+    model = Model(inputs=inputs, outputs=outputs)
 
-    train_dataset = tf.data.Dataset.from_tensor_slices((train_features, train_labels, class_weights)).batch(1)
+    # Compile the model with a specified learning rate
+    model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=0.001))
 
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(1, activation='sigmoid')
-    ])
-    optimizer = tf.keras.optimizers.Adagrad(learning_rate=0.05)
-
-    model.compile(optimizer=optimizer, loss=tf.keras.losses.BinaryCrossentropy(), metrics=['accuracy'])
     # Train the model
-    numEpochs = int(input("Enter number of epochs: "))
+    model.fit(X_train, y_train, epochs=50, batch_size=32)
 
-    model.fit(train_dataset, epochs=numEpochs)
+    # Evaluate the model
+    loss = model.evaluate(X_test, y_test)
 
-    # save the model
-    model.save("savedAiModel")
+    print(f'Test loss: {loss}')
+
+    # Save the model
+    model.save("randomModel")
+
+
+if __name__ == "__main__":
+    aiGuess()

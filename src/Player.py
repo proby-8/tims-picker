@@ -115,12 +115,12 @@ class Player:
             'GPG' : self.__goalsPerGame,
             "TGPG": self.__teamGoalsPerGame,
             "OTGA" : self.__otherTeamGoalsAgainst,
-            'Bet': self.__bet,
-            "Last 5 GPG" : self.__5GPG,
-            "HGPG": self.__historicGPG,
-            "PPG": self.__PPG,
-            "OTPM": self.__OTPM,
-            "Home (1)" : self.__isHome
+            # 'Bet': self.__bet,
+            # "Last 5 GPG" : self.__5GPG,
+            # "HGPG": self.__historicGPG,
+            # "PPG": self.__PPG,
+            # "OTPM": self.__OTPM,
+            # "Home (1)" : self.__isHome
         }
     
     def findHistoricGPG(self):
