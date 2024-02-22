@@ -92,11 +92,12 @@ class Player:
         print("\nPlayers in order:")
 
         name_padding = 30
+        team_padding = 15
         stat_padding = 10
 
         print("\t{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
             "Player Name", name_padding,
-            "Team Name", stat_padding,
+            "Team Name", team_padding,
             "Bet", stat_padding,
             "Stat", stat_padding,
             "GPG", stat_padding,
@@ -115,12 +116,12 @@ class Player:
             'GPG' : self.__goalsPerGame,
             "TGPG": self.__teamGoalsPerGame,
             "OTGA" : self.__otherTeamGoalsAgainst,
-            # 'Bet': self.__bet,
             # "Last 5 GPG" : self.__5GPG,
             # "HGPG": self.__historicGPG,
             # "PPG": self.__PPG,
             # "OTPM": self.__OTPM,
-            # "Home (1)" : self.__isHome
+            # "Home (1)" : self.__isHome,
+            # 'Bet': self.__bet,
         }
     
     def findHistoricGPG(self):
@@ -264,10 +265,12 @@ class Player:
     # to string method
     def __str__ (self):
         name_padding = 30
+        team_padding = 15
         stat_padding = 10
+
         return "{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
             self.getName(), name_padding, 
-            self.getTeamName(), stat_padding, 
+            self.getTeamName(), team_padding, 
             "{:s}".format(self.__bet), stat_padding, 
             "{:.10f}".format(float(self.__stat)), stat_padding, 
             "{:.2f}".format(self.__goalsPerGame), stat_padding, 

@@ -38,10 +38,10 @@ def aiGuess():
 def experimentalTest(createNew, display=True):
 
     if (createNew):
-        experimentalModel()
+        simpleModel()
 
     # load the model
-    model = tf.keras.models.load_model("randomModel")
+    model = tf.keras.models.load_model("newModel")
 
     # get today's players
     players = allPlayers.getAllPlayers()
@@ -71,6 +71,9 @@ def experimentalTest(createNew, display=True):
             'predictVal': prediction
         }
         playersAI.append(playerInfo)
+        prob = model.predict_proba(player[i])[0][1]
+        print(f"{player[i].getName()}, {prob}")
+
     
     # Sort the playersAI list based on 'predict' value in each dictionary
     sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
@@ -87,7 +90,6 @@ def experimentalTest(createNew, display=True):
         i+=1
 
     return sorted_playersAI
-
 
 
 def experimentalModel():
@@ -137,6 +139,69 @@ def experimentalModel():
 
     # Save the model
     model.save("randomModel")
+
+
+def simpleModel():
+    import pandas as pd
+    from sklearn.model_selection import train_test_split
+    from sklearn.linear_model import LogisticRegression
+
+    # Assuming you have a DataFrame 'df' with your data
+    df = pd.read_csv('lib/test.csv')
+
+    # Define the feature columns and the target column
+    feature_cols = ['GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'TGPG', 'OTGA', 'Home (1)']
+    feature_cols = ['GPG', 'TGPG', 'OTGA']
+    target_col = 'Scored'
+
+    # Split the data into training set and test set
+    X_train, X_test, y_train, y_test = train_test_split(df[feature_cols], df[target_col], test_size=0.2, random_state=42)
+
+    # Create a Logistic Regression model
+    model = LogisticRegression()
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Now you can use this model to predict the probability of scoring
+    # get today's players
+    players = allPlayers.getAllPlayers()
+
+    playerInfo = saveData.oddsScraper.scraper() 
+
+    saveData.linker(players, playerInfo)
+
+    playersAI = []
+
+    # Access individual predictions as needed
+    for player in players:
+        all_features = list(player.getFeatures().values())
+        all_features = np.array(all_features, dtype='float32')
+        all_features_reshaped = all_features.reshape(1, -1)
+
+        prediction = model.predict_proba(all_features_reshaped)[0][1]
+        playerInfo = {
+            'player': player,
+            'predictVal': prediction
+        }
+        playersAI.append(playerInfo)
+
+    
+    # Sort the playersAI list based on 'predict' value in each dictionary
+    sorted_playersAI = sorted(playersAI, key=lambda x: x['predictVal'], reverse=True)
+
+    # Print the sorted list
+    display = True
+    if display:
+        Player.printHeader()
+    i=1
+    for player_info in sorted_playersAI:
+        player_info['player'].setStat(player_info['predictVal'])
+        if display:
+            print(f"{i}\t{player_info['player']}")
+        i+=1
+
+    exit(0)
 
 
 if __name__ == "__main__":
