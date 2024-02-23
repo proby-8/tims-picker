@@ -40,7 +40,11 @@ def scraper( league="NHL"):
                     except (IndexError):
                         break
                     for outcome in subCat[0]['outcomes']:
-                        name = outcome['playerNameIdentifier']
+                        try:
+                            name = outcome['playerNameIdentifier']
+                        except KeyError:
+                            name = outcome['participant']
+                            
                         bet = outcome['oddsAmerican']
                         playerInfo.append({
                             "name": name,
