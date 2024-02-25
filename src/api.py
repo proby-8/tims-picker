@@ -33,3 +33,4 @@ def get_list():
 if __name__ == '__main__':
     jsonPlayers = getStats()
     app.run(debug=True)
+

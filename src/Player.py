@@ -298,3 +298,4 @@ class Player:
             'other_team_goals_against': float(self.__otherTeamGoalsAgainst),
             'is_home': int(self.__isHome)      # Assuming __isHome is boolean
         }
+

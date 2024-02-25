@@ -171,3 +171,4 @@ def updateGoalScorers():
                  
                 else:
                     writer.writerow(row)
+
