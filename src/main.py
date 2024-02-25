@@ -4,6 +4,7 @@ if __name__ == "__main__":
     print("2: Make a guess using an AI formulated calculation")
     print("3: Get betting odds from DraftKings")
     print("4: Save today's data")
+    print("5: Empirical Testing")
     choice = int(input("Choice: "))
     print("")
 
@@ -27,6 +28,10 @@ if __name__ == "__main__":
         print("Loading player data...")
         from saveData import main
         main()
+    elif (choice == 5):
+        print("Running empirical calculations...")
+        from empCalc import test
+        test()
     else:
         print("Invalid input")
         exit(1)
