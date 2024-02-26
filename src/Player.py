@@ -167,42 +167,35 @@ class Player:
     def __init__(self, name, id, teamName, teamAbbr, teamId, otherTeamId, isHome, data):
         if (name == ""):
             return
-
-        url = f"https://api-web.nhle.com/v1/player/{id}/landing"
-        r = requests.get(url)
-        self.__playerData = r.json()
-
         self.__name = name
-        self.__playerID = id
-        self.__teamId = teamId
-        self.__teamName = teamName
-        self.__otherTeamId = otherTeamId
-        self.__bet = '0'
+        
+        if (data != -1):
+            url = f"https://api-web.nhle.com/v1/player/{id}/landing"
+            r = requests.get(url)
+            self.__playerData = r.json()
 
-        self.__isHome = isHome
-        self.__goalsPerGame = find_GPGP(self.getName(), data)
-        self.__historicGPG = self.findHistoricGPG()
-        # self.__PPG = find_PPG(self.getName(), data)
-        self.__5GPG = self.findLast5GPG()
-        
-        # teams goals per game
-        self.__teamGoalsPerGame = Player.teamStats[self.__teamId]['gpg']
-        
-        # other team goals against
-        self.__otherTeamGoalsAgainst = Player.teamStats[self.__otherTeamId]['ga']
+            self.__playerID = id
+            self.__teamId = teamId
+            self.__teamName = teamName
+            self.__otherTeamId = otherTeamId
+            self.__bet = '0'
 
-        self.__OTPM = Player.teamStats[self.__otherTeamId]['pm']
-        
-        # stat
-        self.__stat = self.__calculateStat()
+            self.__isHome = isHome
+            self.__goalsPerGame = find_GPGP(self.getName(), data)
+            self.__historicGPG = self.findHistoricGPG()
+            # self.__PPG = find_PPG(self.getName(), data)
+            self.__5GPG = self.findLast5GPG()
+            
+            # teams goals per game
+            self.__teamGoalsPerGame = Player.teamStats[self.__teamId]['gpg']
+            
+            # other team goals against
+            self.__otherTeamGoalsAgainst = Player.teamStats[self.__otherTeamId]['ga']
 
-    def __calculateStat(self):
-        weights=(0.5, 0.25, 0.2, 0.05)
-        if sum(weights) != 1:
-            raise ValueError("Weights must add up to 1.")
-        
-        overallStat = sum(w * stat for w, stat in zip(weights, [self.__goalsPerGame, self.__5GPG, self.__otherTeamGoalsAgainst, self.__isHome]))
-        return overallStat
+            self.__OTPM = Player.teamStats[self.__otherTeamId]['pm']
+            
+            # stat
+            self.__stat = 0
 
     # For comparison
     def __lt__(self, other):

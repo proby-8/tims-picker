@@ -1,9 +1,86 @@
 import datetime
 from itertools import chain
+import pandas as pd
 import requests
 from multiprocessing import Pool
 
+from sklearn.preprocessing import MinMaxScaler
+
 import Player
+
+# calculate stats based on given weights and row of stats
+def calculateStat(row, weights):
+    
+    # Incorporate the relationship between OTPM and PPG
+    ratio = 0.18  # from empirical testing
+    composite_feature = ratio * row['OTPM'] + (1 - ratio) * row['PPG']
+
+    # Replace OTPM and PPG with the composite feature in the row
+    row_without_otpm_ppg = row.drop(['OTPM', 'PPG'])
+    row_with_composite = row_without_otpm_ppg._append(pd.Series([composite_feature], index=['Composite_OTPM_PPG']))
+
+    if len(weights) != len(row_with_composite):
+        raise ValueError("Number of weights must match the number of features.")
+    
+    if round(sum(weights), 2) != 1:
+        print(sum(weights))
+        raise ValueError("Weights must add up to 1.")
+
+    # Calculate the overallStat using the modified row
+    overallStat = sum(w * stat for w, stat in zip(weights, row_with_composite))
+    return overallStat
+
+
+def test():
+    # Load the data
+    try:
+        data = pd.read_csv('lib/data.csv')
+    except UnicodeDecodeError:
+        print("Manually save the csv file and try again.\n")
+        exit(1)
+
+    features = data[['GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'TGPG', 'OTGA', 'Home (1)']]
+    labels = data['Scored']
+    names = data['Name']
+
+    # Normalize the data
+    scaler = MinMaxScaler()
+    normalized_features = scaler.fit_transform(features)
+
+    # The normalized_features is now a numpy array, you can convert it back to a DataFrame if needed
+    normalized_features_df = pd.DataFrame(normalized_features, columns=features.columns)
+
+    # Normalized weights
+    weights = [
+        0.0,
+        0.4,
+        0.3,
+        0.0,
+        0.0,
+        0.1,
+        0.2
+    ]
+
+    # weights = empiricalTest()
+
+    players = []
+
+    for index, normalized_row in normalized_features_df.iterrows():
+        # Access label for the current row
+        label = labels.loc[index]
+        if label == ' ':
+        
+            # Your further logic with the normalized features and label
+            probability = calculateStat(normalized_row, weights)
+            
+            players.append(Player.Player(names[index], -1, -1, -1, -1, -1, -1, -1))
+            players[-1].setStat(probability)
+
+            # Print or use the calculated values
+            # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
+
+    return players
+
 
 def getRoster(teamABBR):
     URL = f"https://api-web.nhle.com/v1/roster/{teamABBR}/20232024"
@@ -106,14 +183,23 @@ def getAllPlayers():
 
 
 def rank():
-    allPlayers = getAllPlayers()
+    #allPlayers = getAllPlayers()
+    allPlayers = test()
     allPlayers = sorted(allPlayers, reverse=True)
-
-    Player.Player.printHeader()
     i=1
     for player in allPlayers:
-        print(f"{i}\t{player}")
+        print("{:>{}} {:<{}} {:>{}}".format(
+            i, 5, 
+            player.getName(), 25, 
+            "{:.10f}".format(float(player.getStat())), 10, 
+        ))
         i+=1
+
+    threshold = 0.48
+    print("\n\nBet on:")
+    for player in allPlayers:
+        if player.getStat() >= threshold:
+            print(f"{player.getName()} : {player.getStat()}")
 
 if __name__ == "__main__":
     rank()
