@@ -24,7 +24,12 @@ def calculateStat(row, weights):
 
 def test():
     # Load the data
-    data = pd.read_csv('lib/data.csv')
+    try:
+        data = pd.read_csv('lib/data.csv')
+    except UnicodeDecodeError:
+        print("Manually save the csv file and try again.\n")
+        exit(1)
+
 
     # Drop the rows where 'Scored' is empty
     data = data[data['Scored'] != ' ']
