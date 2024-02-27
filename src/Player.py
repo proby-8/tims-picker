@@ -36,23 +36,56 @@ class Player:
     def getBet(self):
         return self.__bet
     
+    def setName(self, name):
+        self.__name = name
+    
     def getName(self):
         return self.__name
+    
+    def setId(self, id):
+        self.__id = id
     
     def getId(self):
         return self.__playerID
     
+    def setGPG(self, gpg):
+        self.__goalsPerGame = gpg
+    
     def getGPG(self):
         return self.__goalsPerGame
+    
+    def set5GPG(self, gpg5):
+        self.__5GPG = gpg5
+
+    def setPPG(self, ppg):
+        self.__PPG = ppg
+
+    def setOTPM(self, otpm):
+        self.__OTPM = otpm
+    
+    def setHGPG(self, hgpg):
+        self.__historicGPG = hgpg
     
     def getHGPG(self):
         return self.__historicGPG
     
+    def setTGPG(self, tgpg):
+        self.__teamGoalsPerGame = tgpg
+    
     def getTGPG(self):
         return self.__teamGoalsPerGame
     
+    def setHome(self, isHome):
+        self.__isHome = isHome
+    
+    def setOTGA(self, otga):
+        self.__otherTeamGoalsAgainst = otga
+    
     def getOTGA(self):
         return self.__otherTeamGoalsAgainst
+    
+    def setTeamName(self, teamName):
+        self.__teamName = teamName
     
     def getTeamName(self):
         return self.__teamName
@@ -197,6 +230,41 @@ class Player:
             # stat
             self.__stat = 0
 
+    # calculate stats based on given weights and row of stats
+    def calculateStat( self ):
+
+        weights = [
+            0.0,
+            0.4,
+            0.3,
+            0.0,
+            0.0,
+            0.1,
+            0.2
+        ]
+        
+        # Incorporate the relationship between OTPM and PPG
+        ratio = 0.18  # from empirical testing
+        
+        row = self.getFeatures()
+        composite_feature = ratio * row['OTPM'] + (1 - ratio) * row['PPG']
+
+        # Replace OTPM and PPG with the composite feature in the row
+        row_without_otpm_ppg = row.drop(['OTPM', 'PPG'])
+        row_with_composite = row_without_otpm_ppg._append(pd.Series([composite_feature], index=['Composite_OTPM_PPG']))
+
+        if len(weights) != len(row_with_composite):
+            raise ValueError("Number of weights must match the number of features.")
+        
+        if round(sum(weights), 2) != 1:
+            print(sum(weights))
+            raise ValueError("Weights must add up to 1.")
+
+        # Calculate the overallStat using the modified row
+        overallStat = sum(w * stat for w, stat in zip(weights, row_with_composite))
+        return overallStat
+
+
     # For comparison
     def __lt__(self, other):
         return self.__stat < other.__stat
@@ -261,16 +329,17 @@ class Player:
         team_padding = 15
         stat_padding = 10
 
-        return "{:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
+        return "{:<{}} {:<{}} {:<{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}} {:>{}}".format(
             self.getName(), name_padding, 
             self.getTeamName(), team_padding, 
-            "{:s}".format(self.__bet), stat_padding, 
+            "{:s}".format(str(self.__bet)), stat_padding, 
             "{:.10f}".format(float(self.__stat)), stat_padding, 
             "{:.2f}".format(self.__goalsPerGame), stat_padding, 
             "{:.2f}".format(self.__5GPG), stat_padding, 
             "{:.2f}".format(self.__historicGPG), stat_padding, 
             "{:.2f}".format(self.__PPG), stat_padding, 
-            "{:d}".format(self.__OTPM), stat_padding,
+            "{:d}".format(self.__OTPM), stat_padding,## Function 2: Make a Guess Using an AI Formulated Calculation
+
             "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, 
             "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding, 
             "{:d}".format(self.__isHome), stat_padding

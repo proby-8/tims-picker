@@ -1,5 +1,6 @@
 import datetime
 from itertools import chain
+import unicodedata
 import pandas as pd
 import requests
 from multiprocessing import Pool
@@ -7,6 +8,7 @@ from multiprocessing import Pool
 from sklearn.preprocessing import MinMaxScaler
 
 import Player
+
 
 # calculate stats based on given weights and row of stats
 def calculateStat(row, weights):
@@ -42,6 +44,8 @@ def test():
     features = data[['GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'TGPG', 'OTGA', 'Home (1)']]
     labels = data['Scored']
     names = data['Name']
+    teams = data['Team']
+    bets = data['Bet']
 
     # Normalize the data
     scaler = MinMaxScaler()
@@ -62,22 +66,32 @@ def test():
     ]
 
     # weights = empiricalTest()
-
     players = []
 
     for index, normalized_row in normalized_features_df.iterrows():
+
         # Access label for the current row
         label = labels.loc[index]
         if label == ' ':
-        
+
             # Your further logic with the normalized features and label
             probability = calculateStat(normalized_row, weights)
-            
             players.append(Player.Player(names[index], -1, -1, -1, -1, -1, -1, -1))
+            
             players[-1].setStat(probability)
-
-            # Print or use the calculated values
-            # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
+            players[-1].setGPG(features['GPG'][index])
+            players[-1].setTeamName(teams[index])
+            if bets[index] > 0:
+                players[-1].setBet(f"+{bets[index]}")
+            else:
+                players[-1].setBet(bets[index])
+            players[-1].set5GPG(features['Last 5 GPG'][index])
+            players[-1].setHGPG(features['HGPG'][index])
+            players[-1].setPPG(features['PPG'][index])
+            players[-1].setOTPM(features['OTPM'][index])
+            players[-1].setTGPG(features['TGPG'][index])
+            players[-1].setOTGA(features['OTGA'][index])
+            players[-1].setHome(features['Home (1)'][index])
 
     return players
 
@@ -183,23 +197,21 @@ def getAllPlayers():
 
 
 def rank():
-    #allPlayers = getAllPlayers()
+    # allPlayers = getAllPlayers()
     allPlayers = test()
     allPlayers = sorted(allPlayers, reverse=True)
+    Player.Player.printHeader()
+
     i=1
     for player in allPlayers:
-        print("{:>{}} {:<{}} {:>{}}".format(
-            i, 5, 
-            player.getName(), 25, 
-            "{:.10f}".format(float(player.getStat())), 10, 
-        ))
+        print(f"{i}\t{player}")
         i+=1
 
     threshold = 0.48
     print("\n\nBet on:")
     for player in allPlayers:
         if player.getStat() >= threshold:
-            print(f"{player.getName()} : {player.getStat()}")
+            print(player)
 
 if __name__ == "__main__":
     rank()
