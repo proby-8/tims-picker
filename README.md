@@ -1,4 +1,4 @@
-![image](https://github.com/proby-8/tims-picker/assets/109328434/f342c14e-d9cf-4928-bf55-983dcbfce58d)# Tims-Picker
+# Tims-Picker
 ## About this Program
 
 This program offers a set of functions that provide a reliable method for selecting winning bets for DraftKings NHL Goalscorers. The program includes four main functions, described below.
