@@ -24,8 +24,8 @@ if __name__ == "__main__":
         main()
     elif (choice == 4):
         print("Running empirical calculations...")
-        from empCalc import test
-        test()
+        from empCalc import main
+        main()
     else:
         print("Invalid input")
         exit(1)
