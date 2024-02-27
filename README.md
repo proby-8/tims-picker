@@ -1,5 +1,5 @@
 # SmartScore
-![logo](https://github.com/proby-8/tims-picker/assets/109328434/c207d172-47f9-4bc7-ab31-173047b488d8)
+![smaller logo](https://github.com/proby-8/tims-picker/assets/109328434/bb96bcb9-db9e-4241-93f2-d30a3224fc4d)
 
 ## About this Program
 
