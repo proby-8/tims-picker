@@ -1,4 +1,6 @@
 # SmartScore
+![logo](https://github.com/proby-8/tims-picker/assets/109328434/c207d172-47f9-4bc7-ab31-173047b488d8)
+
 ## About this Program
 
 This program offers a set of functions that provide a reliable method for selecting winning bets for DraftKings NHL Goalscorers. The program includes four main functions, described below.
