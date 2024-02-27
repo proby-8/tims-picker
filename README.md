@@ -29,7 +29,7 @@ Start the main script:<br/>
 ## Images
 AI Output (small dataset, still WIP):        |  Linear Estimator
 :-------------------------:|:-------------------------:
-![image](https://github.com/proby-8/tims-picker/assets/109328434/7d7d8ace-0a5d-4f16-887b-9086ea36baea)  |  ![image](https://github.com/proby-8/tims-picker/assets/109328434/92117d39-6450-40ee-be60-8d12da7bee04)
+![image](https://github.com/proby-8/tims-picker/assets/109328434/551c9924-d980-4534-bdbe-1055f29501e9)  |  ![image](https://github.com/proby-8/tims-picker/assets/109328434/92117d39-6450-40ee-be60-8d12da7bee04)
 
 ---
 *Note: This program is intended for informational purposes only and does not facilitate actual betting. Users should exercise their own judgment and discretion when using the provided suggestions for betting purposes.*
