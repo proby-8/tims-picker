@@ -2,9 +2,8 @@ if __name__ == "__main__":
     print("Please select a function:")
     print("1: Rank all players playing today based off of a predefined formula")
     print("2: Make a guess using an AI formulated calculation")
-    print("3: Get betting odds from DraftKings")
-    print("4: Save today's data")
-    print("5: Empirical Testing")
+    print("3: Save today's data")
+    print("4: Empirical Testing")
     choice = int(input("Choice: "))
     print("")
 
@@ -19,16 +18,11 @@ if __name__ == "__main__":
         from aiMain import aiGuess
         aiGuess()
     elif (choice == 3):
-        # odds scraper
-        print("Gathering odds...")
-        from oddsScraper import main
-        main()
-    elif (choice == 4):
         # saving data
         print("Loading player data...")
         from saveData import main
         main()
-    elif (choice == 5):
+    elif (choice == 4):
         print("Running empirical calculations...")
         from empCalc import test
         test()
