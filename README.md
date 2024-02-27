@@ -1,4 +1,4 @@
-# Tims-Picker
+# SmartScore
 ## About this Program
 
 This program offers a set of functions that provide a reliable method for selecting winning bets for DraftKings NHL Goalscorers. The program includes four main functions, described below.
