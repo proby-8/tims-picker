@@ -37,7 +37,7 @@ def aiGuess():
 def experimentalTest(createNew, display=True):
 
     if (createNew):
-        experimentalModel()
+        model = experimentalModel()
 
     # load the model
     model = tf.keras.models.load_model("randomModel")

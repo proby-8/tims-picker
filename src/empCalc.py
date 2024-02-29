@@ -6,6 +6,7 @@ def main():
     print("1: Find best weight combination based on historical data.")
     print("2: Find best threshold based on weight.")
     print("3: Find weights without combining penalty minutes and powerplay goals.")
+    print("4: Test current weight.")
     choice = int(input("Choice: "))
     print("")
 
@@ -15,6 +16,8 @@ def main():
         thresholdTest()
     elif (choice == 3):
         forPMandPPG()
+    elif (choice == 4):
+        testCurWeight()
     
 
 def calculateStat(row, weights):
@@ -176,6 +179,9 @@ def thresholdTest():
             if ratio > highestStat:
                 highestStat = ratio
                 highestI = i
+        
+        else:
+            break
 
         print(f"i: {i}, Ratio: {counter}/{totalCount}, {ratio}")
 
@@ -324,6 +330,59 @@ def forPMandPPG():
     print(f"Highest weights: {bestWeights}, with {highestStat}")
 
     return bestWeights
+
+def testCurWeight():
+    # Load the data
+    data = pd.read_csv('lib/data.csv')
+
+    # Drop the rows where 'Scored' is empty
+    data = data[data['Scored'] != ' ']
+
+    features = data[['GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'TGPG', 'OTGA', 'Home (1)']]
+    labels = data['Scored']
+    names = data['Name']
+
+    # Normalize the data
+    scaler = MinMaxScaler()
+    normalized_features = scaler.fit_transform(features)
+
+    # The normalized_features is now a numpy array, you can convert it back to a DataFrame if needed
+    normalized_features_df = pd.DataFrame(normalized_features, columns=features.columns)
+
+    # Normalized weights
+    weights = [
+        0.0,
+        0.4,
+        0.3,
+        0.0,
+        0.0,
+        0.1,
+        0.2
+    ]
+
+    # weights = empiricalTest()
+
+    counter = 0
+    totalCount = 0
+
+    for index, normalized_row in normalized_features_df.iterrows():
+        # Access label for the current row
+        label = labels.loc[index]
+
+        # Your further logic with the normalized features and label
+        probability = calculateStat(normalized_row, weights)
+
+        # Print or use the calculated values
+        # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
+        threshold = 0.48
+        if probability >= threshold:
+            totalCount += 1
+            if int(label) == 1:
+                counter += 1
+
+    
+    print(f"Ratio: {counter}/{totalCount}, {counter/totalCount}")
+
 
 if __name__ == "__main__":
     main()
