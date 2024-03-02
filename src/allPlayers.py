@@ -32,6 +32,19 @@ def calculateStat(row, weights):
     overallStat = sum(w * stat for w, stat in zip(weights, row_with_composite))
     return overallStat
 
+def calculateStatNoComp(row, weights):
+    
+    if len(weights) != len(row):
+        raise ValueError("Number of weights must match the number of features.")
+    
+    if round(sum(weights), 2) != 1:
+        print(sum(weights))
+        raise ValueError("Weights must add up to 1.")
+
+    # Calculate the overallStat using the modified row
+    overallStat = sum(w * stat for w, stat in zip(weights, row))
+    return overallStat
+
 
 def test():
     # Load the data
@@ -55,15 +68,7 @@ def test():
     normalized_features_df = pd.DataFrame(normalized_features, columns=features.columns)
 
     # Normalized weights
-    weights = [
-        0.0,
-        0.4,
-        0.3,
-        0.0,
-        0.0,
-        0.1,
-        0.2
-    ]
+    weights = [0.2, 0.3, 0.1, 0.1, 0.2, 0.0, 0.1, 0.0]
 
     # weights = empiricalTest()
     players = []
@@ -75,7 +80,7 @@ def test():
         if label == ' ':
 
             # Your further logic with the normalized features and label
-            probability = calculateStat(normalized_row, weights)
+            probability = calculateStatNoComp(normalized_row, weights)
             players.append(Player.Player(names[index], -1, -1, -1, -1, -1, -1, -1))
             
             players[-1].setStat(probability)

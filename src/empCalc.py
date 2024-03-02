@@ -137,15 +137,7 @@ def thresholdTest():
     normalized_features_df = pd.DataFrame(normalized_features, columns=features.columns)
 
     # Normalized weights
-    weights = [
-        0.0,
-        0.4,
-        0.3,
-        0.0,
-        0.0,
-        0.1,
-        0.2
-    ]
+    weights = [0.2, 0.3, 0.1, 0.1, 0.2, 0.0, 0.1, 0.0]
 
     # weights = empiricalTest()
 
@@ -162,7 +154,7 @@ def thresholdTest():
             label = labels.loc[index]
 
             # Your further logic with the normalized features and label
-            probability = calculateStat(normalized_row, weights)
+            probability = calculateStatNoComp(normalized_row, weights)
 
             # Print or use the calculated values
             # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
@@ -249,11 +241,12 @@ def empiricalTest():
                                         counter += 1
 
                             ratio = counter / totalCount
-                            print(f"Weights: {weights}, Ratio: {counter}/{totalCount}, {ratio}")
+                            # print(f"Weights: {weights}, Ratio: {counter}/{totalCount}, {ratio}")
 
                             if ratio > highestStat:
                                 highestStat = ratio
                                 bestWeights = weights
+
 
     print(f"Highest weights: {bestWeights}, with {highestStat}")
 
@@ -284,10 +277,10 @@ def forPMandPPG():
     for gpg_weight in range(0, 11, 1):
         for last_5_gpg_weight in range(0, 11 - gpg_weight, 1):
             for hgpg_weight in range(0, 11 - gpg_weight - last_5_gpg_weight, 1):
-                for tgpg_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight, 1):
-                    for otga_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight, 1):
-                        for otpm_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight, 1):
-                            for ppg_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight - otpm_weight, 1):
+                for otpm_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight, 1):
+                    for ppg_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - otpm_weight, 1):
+                        for tgpg_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - otpm_weight - ppg_weight, 1):
+                            for otga_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - otpm_weight - ppg_weight - tgpg_weight, 1):
 
                                 home_weight = 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight - otpm_weight - ppg_weight
 
@@ -296,11 +289,11 @@ def forPMandPPG():
                                     round(gpg_weight / 10, 2),
                                     round(last_5_gpg_weight / 10, 2),
                                     round(hgpg_weight / 10, 2),
+                                    round(otpm_weight / 10, 2),
+                                    round(ppg_weight / 10, 2),
                                     round(tgpg_weight / 10, 2),
                                     round(otga_weight / 10, 2),
                                     round(home_weight / 10, 2),
-                                    round(otpm_weight / 10, 2),
-                                    round(ppg_weight / 10, 2)
                                 ]
 
                                 counter = 0
@@ -327,6 +320,8 @@ def forPMandPPG():
                                     highestStat = ratio
                                     bestWeights = weights
 
+            print(weights)
+
     print(f"Highest weights: {bestWeights}, with {highestStat}")
 
     return bestWeights
@@ -350,15 +345,7 @@ def testCurWeight():
     normalized_features_df = pd.DataFrame(normalized_features, columns=features.columns)
 
     # Normalized weights
-    weights = [
-        0.0,
-        0.4,
-        0.3,
-        0.0,
-        0.0,
-        0.1,
-        0.2
-    ]
+    weights = [0.2, 0.3, 0.1, 0.1, 0.2, 0.0, 0.1, 0.0]
 
     # weights = empiricalTest()
 
