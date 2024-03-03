@@ -59,6 +59,7 @@ def test():
     names = data['Name']
     teams = data['Team']
     bets = data['Bet']
+    ids = data['ID']
 
     # Normalize the data
     scaler = MinMaxScaler()
@@ -83,6 +84,8 @@ def test():
             probability = calculateStatNoComp(normalized_row, weights)
             players.append(Player.Player(names[index], -1, -1, -1, -1, -1, -1, -1))
             
+            players[-1].setId(ids[index])
+
             players[-1].setStat(probability)
             players[-1].setGPG(features['GPG'][index])
             players[-1].setTeamName(teams[index])

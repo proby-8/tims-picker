@@ -43,7 +43,7 @@ class Player:
         return self.__name
     
     def setId(self, id):
-        self.__id = id
+        self.__playerID = id
     
     def getId(self):
         return self.__playerID
@@ -56,12 +56,21 @@ class Player:
     
     def set5GPG(self, gpg5):
         self.__5GPG = gpg5
+    
+    def get5GPG(self):
+        return self.__5GPG
 
     def setPPG(self, ppg):
         self.__PPG = ppg
 
+    def getPPG(self):
+        return self.__PPG
+
     def setOTPM(self, otpm):
         self.__OTPM = otpm
+
+    def getOTPM(self):
+        return self.__OTPM
     
     def setHGPG(self, hgpg):
         self.__historicGPG = hgpg
@@ -77,6 +86,9 @@ class Player:
     
     def setHome(self, isHome):
         self.__isHome = isHome
+
+    def isHome(self):
+        return self.__isHome
     
     def setOTGA(self, otga):
         self.__otherTeamGoalsAgainst = otga
@@ -290,7 +302,7 @@ class Player:
             self.getName(),
             self.getId(),
             self.getTeamName(),
-            "{:s}".format(self.__bet),
+            "{:s}".format(str(self.__bet)),
             "{:f}".format(self.__goalsPerGame),
             "{:f}".format(self.__5GPG),
             "{:f}".format(self.__historicGPG),
