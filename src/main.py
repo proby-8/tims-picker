@@ -4,6 +4,7 @@ if __name__ == "__main__":
     print("2: Make a guess using an AI formulated calculation")
     print("3: Save today's data")
     print("4: Empirical Testing")
+    print("5: Daily run (saves data and updates api)")
     choice = int(input("Choice: "))
     print("")
 
@@ -26,6 +27,9 @@ if __name__ == "__main__":
         print("Running empirical calculations...")
         from empCalc import main
         main()
+    elif (choice == 5):
+        print("Running daily upkeep...")
+        from api import main
     else:
         print("Invalid input")
         exit(1)

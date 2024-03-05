@@ -1,5 +1,7 @@
 import csv
 import datetime
+import io
+from typing import Any, Dict, List
 from flask import Flask, jsonify
 from flask_cors import CORS
 import pandas as pd
@@ -98,8 +100,12 @@ def getStats():
             fd.write(f"{currentDate},")
             fd.write(toCSV(player))
 
+    currentDate = datetime.datetime.now().strftime('%Y-%m-%d')
+    data = headerToCSV() + '\n'  # Initialize data with the header line
+    for player in players:
+        data += f"{currentDate}," + toCSV(player) + '\n'
 
-    return jsonPlayers
+    return data
 
 def toCSV(self):
     csv_format = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
@@ -142,7 +148,62 @@ def headerToCSV():
 def get_list():
     return jsonify(jsonPlayers)
 
+def postMethod( data ):
+    import requests
+    import csv
+    import json
+
+    # Read the CSV file and convert it to a JSON-like structure
+    csv_data = []
+    with open("lib/export.csv", newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            csv_data.append(row)
+
+    # Rename the "Home (1)" key to "Home_1" in each dictionary
+    for entry in csv_data:
+        entry['Home_1'] = entry.pop('Home (1)')
+        entry['Last_5_GPG'] = entry.pop('Last 5 GPG')
+        
+        entry['Date'] = str(entry['Date'])
+        entry['Stat'] = float(entry['Stat'])
+        entry['Name'] = str(entry['Name'])
+        entry['ID'] = int(entry['ID'])
+        entry['Team'] = str(entry['Team'])
+        entry['Bet'] = str(entry['Bet'])
+        entry['GPG'] = float(entry['GPG'])
+        entry['Last_5_GPG'] = float(entry['Last_5_GPG'])
+        entry['HGPG'] = float(entry['HGPG'])
+        entry['PPG'] = float(entry['PPG'])
+        entry['OTPM'] = float(entry['OTPM'])
+        entry['TGPG'] = float(entry['TGPG'])
+        entry['OTGA'] = float(entry['OTGA'])
+        entry['Home_1'] = int(entry['Home_1'])
+
+
+    # # Convert the CSV data to JSON
+    json_data = json.dumps({"items": csv_data})
+    json_data: Dict[str, List[Dict[str, Any]]] = json.loads(json_data)
+
+    response = requests.patch("https://x8ki-letl-twmt.n7.xano.io/api:Cmz3Gtkc/addBulk", json=json_data)
+
+    # Check the response
+    if response.status_code == 200:
+        print("Request was successful.")
+        print("Response:", response.json())
+    else:
+        print("Request failed with status code:", response.status_code)
+        print("Response:", response.text)
+
+
+def main():
+    import saveData
+    saveData.main()
+    data = getStats()
+    postMethod(data)
+
 if __name__ == '__main__':
-    jsonPlayers = getStats()
+    data = getStats()
+    postMethod(data)
     # app.run(debug=True)
 
