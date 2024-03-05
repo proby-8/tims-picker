@@ -147,7 +147,7 @@ def updateGoalScorers():
             header = next(reader)  # Read the header line
             rows = list(reader)  # Read the remaining rows into a list of lists
 
-        with open('lib/data.csv', 'w', newline='') as file:
+        with open('lib/data.csv', 'w', newline='', encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(header)  # Write back the header line
             
