@@ -30,6 +30,7 @@ if __name__ == "__main__":
     elif (choice == 5):
         print("Running daily upkeep...")
         from api import main
+        main()
     else:
         print("Invalid input")
         exit(1)
