@@ -12,8 +12,8 @@ from oddsScraper import scraper
 from saveData import linker
 # import your_list_generator_script
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# app = Flask(__name__)
+# CORS(app)  # Enable CORS for all routes
 
 jsonPlayers = None
 
@@ -144,9 +144,9 @@ def headerToCSV():
     )
     return csv_format+"\n"
 
-@app.route('/api/list', methods=['GET'])
-def get_list():
-    return jsonify(jsonPlayers)
+# @app.route('/api/list', methods=['GET'])
+# def get_list():
+#     return jsonify(jsonPlayers)
 
 def postMethod( data ):
     import requests
@@ -203,6 +203,8 @@ def main():
     postMethod(data)
 
 if __name__ == '__main__':
+    import saveData
+    saveData.main()
     data = getStats()
     postMethod(data)
     # app.run(debug=True)
