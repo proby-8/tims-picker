@@ -67,8 +67,8 @@ def getStats():
         label = labels.loc[index]
         if label == ' ':
 
-            # Your further logic with the normalized features and label
             probability = calculateStatNoComp(normalized_row, weights)
+
             players.append(Player(names[index], -1, -1, -1, -1, -1, -1, -1))
             
             players[-1].setId(ids[index])
@@ -92,7 +92,7 @@ def getStats():
 
     # only take today's data
     # do this after calculating probability so data is normailzed over entire data set
-    data = data[data['Date'] == '2024-03-07']
+    data = data[data['Date'] == '2024-03-08']
 
     data.pop('Scored')
     data['Stat'] = probabilities

@@ -1,11 +1,3 @@
-# stats
-# - goals per game
-# - other teams goals against
-# - minutes played
-# - possible stuff
-#   - powerplay minutes
-#   - (could look at other teams penalty minutes)
-
 import os
 import numpy as np
 import time
@@ -94,12 +86,14 @@ def experimentalModel():
     data = pd.read_csv('lib/data.csv')
 
     # Drop the rows where 'Scored' is empty
+    statsToView = ['GPG', 'Last 5 GPG', 'OTGA']
+    
     data = data[data['Scored'] != ' ']
     for col in data.columns:
         data[col] = pd.to_numeric(data[col], errors='coerce')
 
     # Preprocess the data
-    features = data[["GPG", "Last 5 GPG", "OTGA"]]
+    features = data[statsToView]
     # features = data[['GPG','Last 5 GPG','HGPG','PPG','OTPM','TGPG','OTGA','Home (1)']]
     labels = data['Scored']
     
