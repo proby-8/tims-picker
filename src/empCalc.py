@@ -11,12 +11,16 @@ def main():
     print("")
 
     if (choice == 1):
+        # uses comp
         empiricalTest()
     elif (choice == 2):
+        # set up for comp
         thresholdTest()
     elif (choice == 3):
+        # no comp
         forPMandPPG()
     elif (choice == 4):
+        # no comp
         testCurWeight()
     
 
@@ -104,7 +108,7 @@ def test():
         label = labels.loc[index]
 
         # Your further logic with the normalized features and label
-        probability = calculateStat(normalized_row, weights)
+        probability = calculateStatNoComp(normalized_row, weights)
 
         # Print or use the calculated values
         # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
@@ -154,7 +158,7 @@ def thresholdTest():
             label = labels.loc[index]
 
             # Your further logic with the normalized features and label
-            probability = calculateStatNoComp(normalized_row, weights)
+            probability = calculateStat(normalized_row, weights)
 
             # Print or use the calculated values
             # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
@@ -347,8 +351,6 @@ def testCurWeight():
     # Normalized weights
     weights = [0.2, 0.3, 0.1, 0.1, 0.2, 0.0, 0.1, 0.0]
 
-    # weights = empiricalTest()
-
     counter = 0
     totalCount = 0
 
@@ -357,7 +359,7 @@ def testCurWeight():
         label = labels.loc[index]
 
         # Your further logic with the normalized features and label
-        probability = calculateStat(normalized_row, weights)
+        probability = calculateStatNoComp(normalized_row, weights)
 
         # Print or use the calculated values
         # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")

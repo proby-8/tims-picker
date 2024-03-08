@@ -1,18 +1,12 @@
-import csv
 import datetime
-import io
 import json
 from typing import Any, Dict, List
-from flask import Flask, jsonify
-from flask_cors import CORS
+# from flask import Flask, jsonify
+# from flask_cors import CORS
 import pandas as pd
 import requests
 from sklearn.preprocessing import MinMaxScaler
 from Player import Player
-from allPlayers import test
-from oddsScraper import scraper
-from saveData import linker
-# import your_list_generator_script
 
 # app = Flask(__name__)
 # CORS(app)  # Enable CORS for all routes
@@ -54,10 +48,9 @@ def getStats():
     # The normalized_features is now a numpy array, you can convert it back to a DataFrame if needed
     normalized_features_df = pd.DataFrame(normalized_features, columns=features.columns)
 
-    # Normalized weights
+    # Weights from testing
     weights = [0.2, 0.3, 0.1, 0.1, 0.2, 0.0, 0.1, 0.0]
 
-    # weights = empiricalTest()
     players = []
     probabilities = []
 
@@ -92,7 +85,8 @@ def getStats():
 
     # only take today's data
     # do this after calculating probability so data is normailzed over entire data set
-    data = data[data['Date'] == '2024-03-08']
+    date = datetime.date.today().strftime('%Y-%m-%d')
+    data = data[data['Date'] == date]
 
     data.pop('Scored')
     data['Stat'] = probabilities
@@ -114,7 +108,6 @@ def getStats():
              'OTGA': float,
              'Home_1': int}
             )
-
 
     return data
         
@@ -188,7 +181,6 @@ def main():
     updateDatabase(data)
 
 if __name__ == '__main__':
-
     # Update data.csv
     import saveData
     saveData.main()
