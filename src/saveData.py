@@ -21,21 +21,23 @@ def save():
 
     currentDate = datetime.datetime.now().strftime('%Y-%m-%d')
 
+    filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
+
     # Check if the file exists
-    if os.path.isfile('lib/data.csv'):
-        with open('lib/data.csv', 'r') as file:
+    if os.path.isfile(filename):
+        with open(filename, 'r') as file:
             lines = file.readlines()
             last_line = lines[-1].strip().split(',')[0]
 
             if last_line != currentDate:
                 print("Writing")
-                with open('lib/data.csv', 'a') as fd:
+                with open(filename, 'a') as fd:
                     for player in players:
                         fd.write(f"{currentDate},")
                         fd.write(player.toCSV())
     else:
         # If the file doesn't exist, create it and write the current date and player information
-        with open('lib/data.csv', 'a') as fd:
+        with open(filename, 'a') as fd:
             fd.write(Player.Player.headerToCSV())
             for player in players:
                 fd.write(f"{currentDate},")
