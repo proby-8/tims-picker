@@ -144,7 +144,7 @@ def updateGoalScorers():
     playersWhoPlayed = getGoalScorers(date)
 
     if os.path.isfile('lib/data.csv'):
-        with open('lib/data.csv', 'r') as file:
+        with open('lib/data.csv', 'r', encoding='utf-8') as file:
             reader = csv.reader(file)
             header = next(reader)  # Read the header line
             rows = list(reader)  # Read the remaining rows into a list of lists
