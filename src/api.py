@@ -14,6 +14,7 @@ from Player import Player
 jsonPlayers = None
 
 filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
+filename = "lib\\data.csv"
 
 def calculateStatNoComp(row, weights):
     

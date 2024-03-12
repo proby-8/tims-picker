@@ -22,6 +22,7 @@ def save():
     currentDate = datetime.datetime.now().strftime('%Y-%m-%d')
 
     filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
+    filename = "lib\\data.csv"
 
     # Check if the file exists
     if os.path.isfile(filename):
@@ -144,12 +145,12 @@ def updateGoalScorers():
     playersWhoPlayed = getGoalScorers(date)
 
     if os.path.isfile('lib/data.csv'):
-        with open('lib/data.csv', 'r', encoding='utf-8') as file:
+        with open('lib/data.csv', 'r') as file:
             reader = csv.reader(file)
             header = next(reader)  # Read the header line
             rows = list(reader)  # Read the remaining rows into a list of lists
 
-        with open('lib/data.csv', 'w', newline='', encoding="utf-8") as file:
+        with open('lib/data.csv', 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(header)  # Write back the header line
             
