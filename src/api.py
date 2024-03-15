@@ -185,8 +185,8 @@ def main():
 
 if __name__ == '__main__':
     # Update data.csv
-    import saveData
-    saveData.main()
+    # import saveData
+    # saveData.main()
 
     # update database
     data = getStats()
