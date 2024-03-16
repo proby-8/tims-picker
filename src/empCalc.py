@@ -245,7 +245,7 @@ def empiricalTest():
                                         counter += 1
 
                             ratio = counter / totalCount
-                            # print(f"Weights: {weights}, Ratio: {counter}/{totalCount}, {ratio}")
+                            print(f"Weights: {weights}, Ratio: {counter}/{totalCount}, {ratio}")
 
                             if ratio > highestStat:
                                 highestStat = ratio

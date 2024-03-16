@@ -32,7 +32,7 @@ def calculateStatNoComp(row, weights):
 def getStats():
 
     try:
-        data = pd.read_csv(filename)
+        data = pd.read_csv(filename, encoding="utf-8", sep=',')
     except UnicodeDecodeError:
         print("Manually save the csv file and try again.\n")
         exit(1)
