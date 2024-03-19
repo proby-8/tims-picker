@@ -208,6 +208,8 @@ def empiricalTest():
     highestStat = 0
     bestWeights = []
 
+    # USE DATA PARALLELISM TO OPTIMIZE SPEED
+
     for gpg_weight in range(0, 11, 1):
         for last_5_gpg_weight in range(0, 11 - gpg_weight, 1):
             for hgpg_weight in range(0, 11 - gpg_weight - last_5_gpg_weight, 1):
