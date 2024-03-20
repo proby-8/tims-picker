@@ -24,7 +24,7 @@ def scraper( league="NHL"):
             subcategoryIds.append(i['subcategoryId'])
     except UnboundLocalError:
         print("No Goalscorer bets on Draftkings")
-        return
+        exit(1)
 
     for ids in subcategoryIds:
         print("\nGathering odds...\n")

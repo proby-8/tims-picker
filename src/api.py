@@ -14,7 +14,7 @@ from Player import Player
 jsonPlayers = None
 
 filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
-filename = "lib\\data.csv"
+# filename = "lib\\data.csv"
 
 def calculateStatNoComp(row, weights):
     
@@ -30,9 +30,9 @@ def calculateStatNoComp(row, weights):
     return overallStat
 
 def getStats():
-
+    
     try:
-        data = pd.read_csv(filename, encoding="utf-8", sep=',')
+        data = pd.read_csv(filename, encoding="latin1")
     except UnicodeDecodeError:
         print("Manually save the csv file and try again.\n")
         exit(1)

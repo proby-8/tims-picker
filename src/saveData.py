@@ -7,6 +7,9 @@ import Player
 import allPlayers
 import oddsScraper
 
+filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
+# filename = "lib\\data.csv"
+
 def main():
     save()
     updateGoalScorers()
@@ -20,9 +23,6 @@ def save():
     linker(players, playerInfo)
 
     currentDate = datetime.datetime.now().strftime('%Y-%m-%d')
-
-    filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
-    filename = "lib\\data.csv"
 
     # Check if the file exists
     if os.path.isfile(filename):
@@ -144,13 +144,13 @@ def updateGoalScorers():
 
     playersWhoPlayed = getGoalScorers(date)
 
-    if os.path.isfile('lib/data.csv'):
-        with open('lib/data.csv', 'r') as file:
+    if os.path.isfile(filename):
+        with open(filename, 'r') as file:
             reader = csv.reader(file)
             header = next(reader)  # Read the header line
             rows = list(reader)  # Read the remaining rows into a list of lists
 
-        with open('lib/data.csv', 'w', newline='') as file:
+        with open(filename, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(header)  # Write back the header line
             
