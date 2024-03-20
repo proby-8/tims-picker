@@ -34,8 +34,11 @@ def getStats():
     try:
         data = pd.read_csv(filename, encoding="latin1")
     except UnicodeDecodeError:
-        print("Manually save the csv file and try again.\n")
-        exit(1)
+        try:
+            data = pd.read_csv(filename, encoding="utf-8")
+        except UnicodeDecodeError:
+            print("Manually save the csv file and try again.\n")
+            exit(1)
 
     features = data[['GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'TGPG', 'OTGA', 'Home (1)']]
     labels = data['Scored']

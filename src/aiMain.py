@@ -83,7 +83,16 @@ def experimentalTest(createNew, display=True):
 
 def experimentalModel():
     # Load the data
-    data = pd.read_csv('lib/data.csv')
+    
+    filename = "lib\\data.csv"
+    try:
+        data = pd.read_csv(filename, encoding="latin1")
+    except UnicodeDecodeError:
+        try:
+            data = pd.read_csv(filename, encoding="utf-8")
+        except UnicodeDecodeError:
+            print("Manually save the csv file and try again.\n")
+            exit(1)
 
     # Drop the rows where 'Scored' is empty
     statsToView = ['GPG', 'Last 5 GPG', 'OTGA']
