@@ -5,7 +5,31 @@ class Player:
 
     teamStats = {}
 
-    # intializer for weightedGuess
+    @classmethod
+    def noStatInit(cls, name, id, teamName, teamAbbr, teamId, otherTeamId, isHome, data):
+        if (name == ""):
+            return
+        playerInstance = cls(name, teamName, id, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, isHome, 0, 0)
+        
+        url = f"https://api-web.nhle.com/v1/player/{id}/landing"
+        r = requests.get(url)
+        playerInstance.__playerData = r.json()
+
+        playerInstance.__teamId = teamId
+        playerInstance.__otherTeamId = otherTeamId
+        playerInstance.__teamData = data
+        
+        playerInstance.__goalsPerGame = playerInstance.findGPGP()
+        playerInstance.__5GPG = playerInstance.findLast5GPG()
+        playerInstance.__historicGPG = playerInstance.findHistoricGPG()
+        playerInstance.__PPG = playerInstance.find_PPG()
+        playerInstance.__otherTeamGoalsAgainst = Player.teamStats[playerInstance.__otherTeamId]['ga']
+        playerInstance.__teamGoalsPerGame = Player.teamStats[playerInstance.__teamId]['gpg']        
+        playerInstance.__OTPM = Player.teamStats[playerInstance.__otherTeamId]['pm']
+        playerInstance.__stat = 0
+
+        return playerInstance
+
     def __init__(self, name, teamName, id, gpg, gpg5, hgpg, ppg, otpm, tgpg, otga, isHome, bet=0, stat=0):
         if (name == ""):
             return
@@ -115,8 +139,84 @@ class Player:
     def getTeamId(self):
         return self.__teamId
     
-    # init all teams stats at once? More overhead for days with fewer games, but less api calls for each game
+    # get stats
+    def findGPGP(self):
+        playerName = self.getName()
+        for player in self.__teamData["skaters"]:
+            full_name = f"{player['firstName']['default']} {player['lastName']['default']}"
+            if full_name.lower() == playerName.lower():
+                return player['goals'] / player['gamesPlayed']
+        return 0.0
 
+    def findLast5GPG(self):
+        goals = 0
+        games = 5
+        try:
+            for game_data in self.__playerData['last5Games']:
+                goals += game_data['goals']
+        except KeyError:
+            return 0
+            
+        return goals/games
+    
+    def findHistoricGPG(self):
+        ppg = 0
+        goals = 0
+        games = 0
+        acceptableSeasons = [20232024, 20222023, 20212022]
+        for season_data in self.__playerData['seasonTotals']:
+            if ((season_data['season'] in acceptableSeasons) and (season_data['leagueAbbrev'] == "NHL")):
+                try:
+                    tempPPG = season_data['powerPlayGoals']
+                    tempGoals = season_data['goals']
+                    tempGames = season_data['gamesPlayed']
+
+                    ppg += tempPPG
+                    goals += tempGoals
+                    games += tempGames
+                except:
+                    # weird
+                    pass
+
+        self.__PPG = ppg
+
+        if games == 0:
+            return 0
+        
+        return goals/games
+    
+    def find_PPG(self):
+        data = self.__teamData
+        playerName = self.getName()
+        for player in data["skaters"]:
+            full_name = f"{player['firstName']['default']} {player['lastName']['default']}"
+            if full_name.lower() == playerName.lower():
+                return player['powerPlayGoals']
+        return 0.0
+    
+    @classmethod
+    def initTeamStats( cls, teamId, otherTeamId ):
+        url = f"https://api.nhle.com/stats/rest/en/team/summary?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
+        r = requests.get(url)
+        data = r.json()
+
+        url2 = f"https://api.nhle.com/stats/rest/en/team/penaltykilltime?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
+        r2 = requests.get(url2)
+        data2 = r2.json()
+
+        for team in data["data"]:
+            if (teamId == team['teamId'] or otherTeamId == team['teamId']):
+                cls.teamStats[team['teamId']] = {
+                                            "gpg" : team["goalsForPerGame"],
+                                            "ga"  : team['goalsAgainstPerGame']
+                                        }
+
+        for team in data2["data"]:
+            if (teamId == team['teamId'] or otherTeamId == team['teamId']):
+                cls.teamStats[team['teamId']].update({
+                                            "pm" : team["timeOnIceShorthanded"]
+                                        })
+                
     @classmethod
     def printHeader ( cls ):
         print("\nPlayers in order:")
@@ -160,6 +260,44 @@ class Player:
     def __ge__(self, other):
         return self.__stat >= other.__stat
 
+    def toCSV(self):
+        csv_format = "{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
+            ' ',
+            self.getName(),
+            self.getId(),
+            self.getTeamName(),
+            "{:s}".format(str(self.__bet)),
+            "{:f}".format(self.__goalsPerGame),
+            "{:f}".format(self.__5GPG),
+            "{:f}".format(self.__historicGPG),
+            "{:f}".format(self.__PPG),
+            "{:d}".format(self.__OTPM),
+            "{:f}".format(self.__teamGoalsPerGame),
+            "{:f}".format(self.__otherTeamGoalsAgainst),
+            "{:d}".format(self.__isHome)
+        )
+        return csv_format+"\n"
+
+    @classmethod
+    def headerToCSV(self):
+        csv_format = "{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
+            "Data",
+            "Scored",
+            "Name",
+            "ID",
+            "Team",
+            "Bet",
+            "GPG",
+            "Last 5 GPG",
+            "HGPG",
+            "PPG",
+            "OTPM",
+            "TGPG",
+            "OTGA",
+            "Home (1)"
+        )
+        return csv_format+"\n"
+
     # to string method
     def __str__ (self):
         name_padding = 30
@@ -175,8 +313,7 @@ class Player:
             "{:.2f}".format(self.__5GPG), stat_padding, 
             "{:.2f}".format(self.__historicGPG), stat_padding, 
             "{:.2f}".format(self.__PPG), stat_padding, 
-            "{:d}".format(self.__OTPM), stat_padding,## Function 2: Make a Guess Using an AI Formulated Calculation
-
+            "{:d}".format(self.__OTPM), stat_padding,
             "{:.2f}".format(self.__teamGoalsPerGame), stat_padding, 
             "{:.2f}".format(self.__otherTeamGoalsAgainst), stat_padding, 
             "{:d}".format(self.__isHome), stat_padding

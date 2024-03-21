@@ -1,5 +1,8 @@
 import csv
+import os
 import pandas as pd
+
+from newPlayer import Player
 
 def getCSVEncoding(filename):
     try:
@@ -37,7 +40,7 @@ def findMatch(id, players):
 def updateGoalScorerRows(filename, date, playersWhoPlayed):
 
     try:
-        with open(filename, 'r', endcoding=getCSVEncoding(filename)) as file:
+        with open(filename, 'r', encoding=getCSVEncoding(filename)) as file:
             reader = csv.reader(file)
             header = next(reader)  # Read the header line
             rows = list(reader)  # Read the remaining rows into a list of lists    
@@ -72,3 +75,24 @@ def updateGoalScorerRows(filename, date, playersWhoPlayed):
     except UnicodeDecodeError:
         print("Manually save the csv file and try again.\n")
         exit(1)
+
+def updateNewDay(filename, currentDate, players):
+
+    # Check if the file exists
+    if os.path.isfile(filename):
+        with open(filename, 'r') as file:
+            lines = file.readlines()
+            last_line = lines[-1].strip().split(',')[0]
+
+            if last_line != currentDate:
+                with open(filename, 'a') as fd:
+                    for player in players:
+                        fd.write(f"{currentDate},")
+                        fd.write(player.toCSV())
+    else:
+        # If the file doesn't exist, create it and write the current date and player information
+        with open(filename, 'a') as fd:
+            fd.write(Player.Player.headerToCSV())
+            for player in players:
+                fd.write(f"{currentDate},")
+                fd.write(player.toCSV())

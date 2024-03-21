@@ -1,12 +1,16 @@
 import datetime
 from itertools import chain
+import json
 from multiprocessing import Pool
+from typing import Any, Dict, List
 import requests
-
-import Player
-from newDataHandler import updateGoalScorerRows
+from newDataHandler import updateGoalScorerRows, updateNewDay
+from newPlayer import Player
+import newOddsScraper as oddsScraper
+import newWeightedGuess as weightedGuess
 
 filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
+filename = "lib\\data.csv"
 
 def get_players(game_data):
     players = []
@@ -103,6 +107,7 @@ def getRoster(teamABBR):
     return players
 
 def getPlayersFromTeam(team):
+    Player.initTeamStats(team['id'], team['otherId'])
     allPlayers = []
 
     roster = getRoster(team['abbr'])
@@ -113,7 +118,7 @@ def getPlayersFromTeam(team):
     data = r.json()
 
     for player in roster:
-        allPlayers.append(Player.Player(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], team['home'], data))
+        allPlayers.append(Player.noStatInit(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], team['home'], data))
 
     return allPlayers
 
@@ -144,12 +149,65 @@ def getAllPlayers():
 
     return allPlayers
 
+def compareNames(name1, name2):
+    name1 = str(name1).lower().replace(" ", "")
+    name2 = str(name2).lower().replace(" ", "")
+
+    if name1 == name2:
+        return True
+    return False
+
+def linker(players, playerInfo):
+    for player in playerInfo:
+        matchFound = 0
+        # could change to sort and binary search, but only takes 0.00001 seconds anyways
+        for playerData in players:
+            if compareNames(player['name'], playerData.getName()):
+                matchFound = 1
+                playerData.setBet(player['bet'])
+        
+        if (not matchFound):
+            print(f"Could not find - Player: {player['name']}, Bet: {player['bet']}")
+
+def updateDatabase( data ):
+    # Convert the CSV data to type dictionary
+    data_dict = data.to_dict(orient='records')
+
+    # Convert the dictionary to JSON
+    json_data = json.dumps({"items": data_dict})
+
+    # set it back to dictionary type
+    json_data: Dict[str, List[Dict[str, Any]]] = json.loads(json_data)
+
+    response = requests.patch("https://x8ki-letl-twmt.n7.xano.io/api:Cmz3Gtkc/addBulk", json=json_data)
+
+    # Check the response
+    if response.status_code == 200:
+        print("Successfully updated the database. ", end="")
+        print("Response:", response.json())
+    else:
+        print("Request failed with status code:", response.status_code)
+        print("Response:", response.text)
+
 def main():
-    updateScored()
+    # updateScored()
 
     # get all players today
-    players = getAllPlayers()
+    #players = getAllPlayers()
+
     # get odds and link them
+    #playerOdds = oddsScraper.scraper()
+    #linker(players, playerOdds)
+
+    # write to file
+    #updateNewDay(filename, datetime.datetime.now().strftime('%Y-%m-%d'), players)
+
+    # use file to generate stats
+    playerWithStats = weightedGuess.weightedGuessNoPrint()
+    updateDatabase(playerWithStats)
+    
+
+
 
 if __name__ == "__main__":
     main()
