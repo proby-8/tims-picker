@@ -2,7 +2,7 @@ if __name__ == "__main__":
     print("Please select a function:")
     print("1: Rank all players playing today based off of a predefined formula")
     print("2: Make a guess using an AI formulated calculation")
-    print("3: Save today's data")
+    print("3: Save today's data - Depreciated, use daily run instead.")
     print("4: Empirical Testing")
     print("5: Daily run (saves data and updates api)")
     choice = int(input("Choice: "))
@@ -19,9 +19,8 @@ if __name__ == "__main__":
         from aiMain import aiGuess
         aiGuess()
     elif (choice == 3):
-        # saving data
-        print("Loading player data...")
-        from saveData import main
+        print("Running daily upkeep...")
+        from api import main
         main()
     elif (choice == 4):
         print("Running empirical calculations...")

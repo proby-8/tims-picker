@@ -8,7 +8,7 @@ import allPlayers
 import oddsScraper
 
 filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
-# filename = "lib\\data.csv"
+filename = "lib\\data.csv"
 
 def main():
     save()
@@ -174,3 +174,6 @@ def updateGoalScorers():
                 else:
                     writer.writerow(row)
 
+if __name__ == "__main__":
+    main()
+    updateGoalScorers()

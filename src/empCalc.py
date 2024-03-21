@@ -210,6 +210,8 @@ def empiricalTest():
 
     # USE DATA PARALLELISM TO OPTIMIZE SPEED
 
+    # could i just calculate probability for those who actually score, check those stats, and then base it off that? Will be like 10 times faster, could then run the top 10 or so weights against all data
+
     for gpg_weight in range(0, 11, 1):
         for last_5_gpg_weight in range(0, 11 - gpg_weight, 1):
             for hgpg_weight in range(0, 11 - gpg_weight - last_5_gpg_weight, 1):

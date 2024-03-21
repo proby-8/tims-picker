@@ -24,11 +24,12 @@ class Player:
 
     teamStats = {}
     
-    def getStat(self):
-        return self.__stat
-    
+    # accessor/mutator methods
     def setStat(self, stat):
         self.__stat = stat
+        
+    def getStat(self):
+        return self.__stat
 
     def setBet(self, bet):
         self.__bet = bet
@@ -101,9 +102,15 @@ class Player:
     
     def getTeamName(self):
         return self.__teamName
-    
+
+    def setTeamAbbr(self, teamABBR):
+        self.__teamAbbr = teamABBR 
+       
     def getTeamAbbr(self):
         return self.__teamAbbr
+    
+    def setTeamId(self, teamID):
+        self.__teamId = teamID
     
     def getTeamId(self):
         return self.__teamId
