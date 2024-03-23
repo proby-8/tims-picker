@@ -59,23 +59,25 @@ def getTeams(data, target_date):
     for game_day in data["gameWeek"]:
         if game_day["date"] == target_date:
             for game in game_day["games"]:
-                teamInfoHome = {
-                    'name': (game["homeTeam"]["placeName"]["default"]),
-                    'abbr': (game["homeTeam"]["abbrev"]),
-                    'id': (game['homeTeam']['id']),
-                    'otherId': (game['awayTeam']['id']),
-                    'home': 1
-                }
-                teamInfoAway = {
-                    'name': (game["awayTeam"]["placeName"]["default"]),
-                    'abbr': (game["awayTeam"]["abbrev"]),
-                    'id': (game['awayTeam']['id']),
-                    'otherId': (game['homeTeam']['id']),
-                    'home': 0
-                }
+                # ensure game hasn't started yet
+                if (game['gameState'] == 'FUT'):  
+                    teamInfoHome = {
+                        'name': (game["homeTeam"]["placeName"]["default"]),
+                        'abbr': (game["homeTeam"]["abbrev"]),
+                        'id': (game['homeTeam']['id']),
+                        'otherId': (game['awayTeam']['id']),
+                        'home': 1
+                    }
+                    teamInfoAway = {
+                        'name': (game["awayTeam"]["placeName"]["default"]),
+                        'abbr': (game["awayTeam"]["abbrev"]),
+                        'id': (game['awayTeam']['id']),
+                        'otherId': (game['homeTeam']['id']),
+                        'home': 0
+                    }
 
-                teams.append(teamInfoHome)
-                teams.append(teamInfoAway)
+                    teams.append(teamInfoHome)
+                    teams.append(teamInfoAway)
 
     return teams
 
@@ -190,17 +192,17 @@ def updateDatabase( data ):
         print("Response:", response.text)
 
 def main():
-    # updateScored()
+    updateScored()
 
     # get all players today
-    #players = getAllPlayers()
+    players = getAllPlayers()
 
     # get odds and link them
-    #playerOdds = oddsScraper.scraper()
-    #linker(players, playerOdds)
+    playerOdds = oddsScraper.scraper()
+    linker(players, playerOdds)
 
     # write to file
-    #updateNewDay(filename, datetime.datetime.now().strftime('%Y-%m-%d'), players)
+    updateNewDay(filename, datetime.datetime.now().strftime('%Y-%m-%d'), players)
 
     # use file to generate stats
     playerWithStats = weightedGuess.weightedGuessNoPrint()

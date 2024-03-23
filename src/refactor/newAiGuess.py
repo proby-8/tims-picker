@@ -7,13 +7,13 @@ import tensorflow as tf
 import newPlayer as Player
 from newDataHandler import readCSV
 
-statsToCheck = ['GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'TGPG', 'OTGA', 'Home (1)']
+statsToCheck = ['Bet', 'GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'OTGA']
 
 def createModel( data ):
     # Drop the rows where 'Scored' is empty    
     data = data[data['Scored'] != ' ']
     for col in data.columns:
-        data[col] = pd.to_numeric(data[col], errors='coerce')
+        data[col] = pd.to_numeric(data.loc[col], errors='coerce')
 
     # Preprocess the data
     features = data[statsToCheck]
@@ -39,10 +39,10 @@ def createModel( data ):
     model = Model(inputs=inputs, outputs=outputs)
 
     # Compile the model with a specified learning rate
-    model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=0.001))
+    model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001))
 
     # Train the model
-    model.fit(X_train, Y_train, epochs=50, batch_size=32)
+    model.fit(X_train, Y_train, epochs=256, batch_size=64)
 
     # model.save("randomModel")
 
@@ -120,6 +120,8 @@ def aiGuess():
     Player.Player.printHeader()
     for index, player in enumerate(players):
         print(f"{index+1}\t{player}")
+        if index>450:
+            break
 
 def aiGuessNoPrint():
     players = main()
