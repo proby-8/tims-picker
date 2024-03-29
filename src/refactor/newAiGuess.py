@@ -10,10 +10,12 @@ from newDataHandler import readCSV
 statsToCheck = ['Bet', 'GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'OTGA']
 
 def createModel( data ):
-    # Drop the rows where 'Scored' is empty    
+    # Drop the rows where 'Scored' is empty
     data = data[data['Scored'] != ' ']
+
     for col in data.columns:
-        data[col] = pd.to_numeric(data.loc[col], errors='coerce')
+        data[col] = pd.to_numeric(data[col], errors='coerce')
+
 
     # Preprocess the data
     features = data[statsToCheck]
