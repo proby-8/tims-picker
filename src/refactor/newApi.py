@@ -161,14 +161,18 @@ def compareNames(name1, name2):
 
 def linker(players, playerInfo):
     for player in playerInfo:
+        if player['name'] == "TJ Brodie":
+            player['name'] = "T.J. Brodie"
         matchFound = 0
+
         # could change to sort and binary search, but only takes 0.00001 seconds anyways
         for playerData in players:
-            if compareNames(player['name'], playerData.getName()):
+            sanitizedName = playerData.getName().replace("è", "e")
+            if compareNames(player['name'], sanitizedName):
                 matchFound = 1
                 playerData.setBet(player['bet'])
         
-        if (not matchFound):
+        if not matchFound:
             print(f"Could not find - Player: {player['name']}, Bet: {player['bet']}")
 
 def updateDatabase( data ):
