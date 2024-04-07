@@ -2,6 +2,7 @@ import datetime
 from itertools import chain
 import json
 from multiprocessing import Pool
+import os
 from typing import Any, Dict, List
 import requests
 from newDataHandler import updateGoalScorerRows, updateNewDay
@@ -109,6 +110,7 @@ def getRoster(teamABBR):
     return players
 
 def getPlayersFromTeam(team):
+    print("now here")
     Player.initTeamStats(team['id'], team['otherId'])
     allPlayers = []
 
@@ -118,6 +120,7 @@ def getPlayersFromTeam(team):
     url = f"https://api-web.nhle.com/v1/club-stats/{team['abbr']}/20232024/2"
     r = requests.get(url)
     data = r.json()
+
 
     for player in roster:
         allPlayers.append(Player.noStatInit(player['name'], player['id'], team['name'], team['abbr'], team['id'], team['otherId'], team['home'], data))

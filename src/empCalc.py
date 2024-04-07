@@ -336,7 +336,7 @@ def forPMandPPG():
 
 def testCurWeight():
     # Load the data
-    data = pd.read_csv('lib/data.csv')
+    data = pd.read_csv('lib/data.csv', encoding="latin")
 
     # Drop the rows where 'Scored' is empty
     data = data[data['Scored'] != ' ']
