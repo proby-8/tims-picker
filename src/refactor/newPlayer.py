@@ -197,13 +197,11 @@ class Player:
     @classmethod
     def initTeamStats( cls, teamId, otherTeamId ):
         url = f"https://api.nhle.com/stats/rest/en/team/summary?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
-        print(url)
         r = requests.get(url)
         data = r.json()
 
         url2 = f"https://api.nhle.com/stats/rest/en/team/penaltykilltime?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
-        print(url2)
-        r2 = requests.get(url2)
+        r2 = requests.gt(url2)
         data2 = r2.json()
 
         for team in data["data"]:

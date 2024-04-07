@@ -110,7 +110,6 @@ def getRoster(teamABBR):
     return players
 
 def getPlayersFromTeam(team):
-    print("now here")
     Player.initTeamStats(team['id'], team['otherId'])
     allPlayers = []
 
