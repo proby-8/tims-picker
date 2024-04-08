@@ -201,7 +201,7 @@ class Player:
         data = r.json()
 
         url2 = f"https://api.nhle.com/stats/rest/en/team/penaltykilltime?cayenneExp=seasonId=20232024%20and%20gameTypeId=2"
-        r2 = requests.gt(url2)
+        r2 = requests.get(url2)
         data2 = r2.json()
 
         for team in data["data"]:

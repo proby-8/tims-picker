@@ -163,8 +163,11 @@ def compareNames(name1, name2):
 
 def linker(players, playerInfo):
     for player in playerInfo:
-        if player['name'] == "TJ Brodie":
-            player['name'] = "T.J. Brodie"
+        if player['name'] == "T.J. Brodie":
+            player['name'] = "TJ Brodie"
+
+        if player['name'] == "Mitchell Marner":
+            player['name'] = "Mitch Marner"
         matchFound = 0
 
         # could change to sort and binary search, but only takes 0.00001 seconds anyways
