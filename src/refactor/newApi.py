@@ -10,9 +10,6 @@ from newPlayer import Player
 import newOddsScraper as oddsScraper
 import newWeightedGuess as weightedGuess
 
-filename = "D:\\code\\python\\tims-picker\\lib\\data.csv"
-filename = "lib\\data.csv"
-
 def get_players(game_data):
     players = []
     
@@ -52,7 +49,7 @@ def updateScored():
         playersWhoPlayed += get_players(newData['playerByGameStats'])
 
     # we now have all players who played
-    updateGoalScorerRows(filename, date, playersWhoPlayed)
+    updateGoalScorerRows("lib\\data.csv", date, playersWhoPlayed)
 
 def getTeams(data, target_date):
     teams = []
@@ -211,7 +208,7 @@ def main():
     linker(players, playerOdds)
 
     # write to file
-    updateNewDay(filename, datetime.datetime.now().strftime('%Y-%m-%d'), players)
+    updateNewDay("lib\\data.csv", datetime.datetime.now().strftime('%Y-%m-%d'), players)
 
     # use file to generate stats
     playerWithStats = weightedGuess.weightedGuessNoPrint()

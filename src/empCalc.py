@@ -124,7 +124,7 @@ def test():
 
 def thresholdTest():
     # Load the data
-    data = pd.read_csv('lib/data.csv')
+    data = pd.read_csv('lib/data.csv', encoding="latin")
 
     # Drop the rows where 'Scored' is empty
     data = data[data['Scored'] != ' ']
@@ -158,7 +158,7 @@ def thresholdTest():
             label = labels.loc[index]
 
             # Your further logic with the normalized features and label
-            probability = calculateStat(normalized_row, weights)
+            probability = calculateStatNoComp(normalized_row, weights)
 
             # Print or use the calculated values
             # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
