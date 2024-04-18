@@ -3,6 +3,7 @@ from itertools import chain
 import json
 from multiprocessing import Pool
 import os
+import time
 from typing import Any, Dict, List
 import requests
 from newDataHandler import updateGoalScorerRows, updateNewDay
@@ -29,6 +30,7 @@ def get_players(game_data):
 
 def updateScored():
     # get goal scorers
+
     today = datetime.datetime.now()
     yesterday = today - datetime.timedelta(days=1)
     date = yesterday.strftime('%Y-%m-%d')
@@ -214,8 +216,6 @@ def main():
     playerWithStats = weightedGuess.weightedGuessNoPrint()
     updateDatabase(playerWithStats)
     
-
-
 
 if __name__ == "__main__":
     main()

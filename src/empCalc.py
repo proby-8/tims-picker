@@ -7,6 +7,7 @@ def main():
     print("2: Find best threshold based on weight.")
     print("3: Find weights without combining penalty minutes and powerplay goals.")
     print("4: Test current weight.")
+    print("5: 1 but in C")
     choice = int(input("Choice: "))
     print("")
 
@@ -22,6 +23,17 @@ def main():
     elif (choice == 4):
         # no comp
         testCurWeight()
+    elif (choice == 5):
+        cTest()
+
+def cTest():
+    import ctypes
+
+    # Load the shared library into c types.
+    lib = ctypes.CDLL('./sharedLib.so')
+
+    # Call the function
+    lib.empiricalTest()
     
 
 def calculateStat(row, weights):
@@ -189,7 +201,7 @@ def thresholdTest():
 
 def empiricalTest():
     # Load the data
-    data = pd.read_csv('lib/data.csv')
+    data = pd.read_csv('../lib/data.csv', encoding="latin")
 
     # Drop the rows where 'Scored' is empty
     data = data[data['Scored'] != ' ']
@@ -220,6 +232,7 @@ def empiricalTest():
                         for comp_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight, 1):
                             home_weight = 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight - comp_weight
 
+                            print("here")
                             # Normalized weights
                             weights = [
                                 round(gpg_weight / 10, 2),
@@ -248,12 +261,15 @@ def empiricalTest():
                                     if int(label) == 1:
                                         counter += 1
 
+                                #exit(0)
+
                             ratio = counter / totalCount
                             print(f"Weights: {weights}, Ratio: {counter}/{totalCount}, {ratio}")
 
                             if ratio > highestStat:
                                 highestStat = ratio
                                 bestWeights = weights
+                            exit(0)
 
 
     print(f"Highest weights: {bestWeights}, with {highestStat}")
