@@ -136,7 +136,7 @@ def test():
 
 def thresholdTest():
     # Load the data
-    data = pd.read_csv('lib/data.csv', encoding="latin")
+    data = pd.read_csv('../lib/data.csv', encoding="latin")
 
     # Drop the rows where 'Scored' is empty
     data = data[data['Scored'] != ' ']
@@ -153,11 +153,12 @@ def thresholdTest():
     normalized_features_df = pd.DataFrame(normalized_features, columns=features.columns)
 
     # Normalized weights
-    weights = [0.2, 0.3, 0.1, 0.1, 0.2, 0.0, 0.1, 0.0]
+    # weights = [0.2, 0.3, 0.1, 0.1, 0.2, 0.0, 0.1, 0.0]
+    weights = [0.0, 0.4, 0.0, 0.3, 0.0, 0.3, 0.0]
 
     # weights = empiricalTest()
 
-    i = 0
+    i = 0.35
     highestStat = 0
     highestI = i
     while i < 1:
@@ -170,7 +171,8 @@ def thresholdTest():
             label = labels.loc[index]
 
             # Your further logic with the normalized features and label
-            probability = calculateStatNoComp(normalized_row, weights)
+            # probability = calculateStatNoComp(normalized_row, weights)
+            probability = calculateStat(normalized_row, weights)
 
             # Print or use the calculated values
             # print(f"Name: {names.loc[index]}, Probability: {probability}, Label: {label}")
@@ -205,6 +207,7 @@ def empiricalTest():
 
     # Drop the rows where 'Scored' is empty
     data = data[data['Scored'] != ' ']
+    print(len(data))
 
     features = data[['GPG', 'Last 5 GPG', 'HGPG', 'PPG', 'OTPM', 'TGPG', 'OTGA', 'Home (1)']]
     labels = data['Scored']
@@ -232,7 +235,6 @@ def empiricalTest():
                         for comp_weight in range(0, 11 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight, 1):
                             home_weight = 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight - comp_weight
 
-                            print("here")
                             # Normalized weights
                             weights = [
                                 round(gpg_weight / 10, 2),
@@ -252,6 +254,7 @@ def empiricalTest():
                                 label = labels.loc[index]
 
                                 # Your further logic with the normalized features and label
+                                print(features.loc[index])
                                 probability = calculateStat(normalized_row, weights)
 
                                 # Print or use the calculated values
@@ -261,7 +264,7 @@ def empiricalTest():
                                     if int(label) == 1:
                                         counter += 1
 
-                                #exit(0)
+                                exit(0)
 
                             ratio = counter / totalCount
                             print(f"Weights: {weights}, Ratio: {counter}/{totalCount}, {ratio}")

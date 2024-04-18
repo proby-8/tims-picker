@@ -4,6 +4,7 @@
 #include <math.h>
 
 float calculateStat(float data[], float weights[]) {
+
     float probability = 0;
 
     float ratio = 0.18;
@@ -13,7 +14,7 @@ float calculateStat(float data[], float weights[]) {
     float newData[7] = {data[1], data[2], data[3], composite, data[6], data[7], data[8]};
 
     for (int i = 0; i < 7; i++) {
-        probability += data[i] * weights[i];
+        probability += newData[i] * weights[i];
     }
 
     // Apply the sigmoid function?
@@ -98,6 +99,25 @@ void empiricalTest() {
         data[i][8] = atof(token);
     }
 
+    // Normalize the data array
+    // Scale the data using Min-Max scaling
+    float min = data[0][0];
+    float max = data[0][0];
+    for (int j = 1; j < 9; j++) {
+        for (int i = 0; i < numRows; i++) {
+            if (data[i][j] < min) {
+                min = data[i][j];
+            }
+            if (data[i][j] > max) {
+                max = data[i][j];
+            }
+        }
+
+        for (int i = 0; i < numRows; i++) {
+            data[i][j] = (data[i][j] - min) / (max - min);
+        }
+    }
+
     // Close the file
     fclose(file);
 
@@ -136,13 +156,12 @@ void empiricalTest() {
                                 // printf("%f\n", probability);
 
                                 // Check if the prediction is correct
-                                if (probability >= 0.5) {
+                                if (probability >= 0.48) {
                                     totalCount++;
                                     if (data[i][0] == 1) {
                                         counter++;
                                     }
                                 }
-                                // exit(0);
                             }
 
 
@@ -150,7 +169,11 @@ void empiricalTest() {
                             float ratio = (float)counter / totalCount;
 
                             // display the ratio
-                            printf("%d \\ %d : %f\n", counter, totalCount, ratio);
+                            // printf("%d \\ %d : %f - ", counter, totalCount, ratio);
+                            // for (int i = 0; i < 7; i++) {
+                            //     printf("%f, ", weights[i]);
+                            // }
+                            // printf("\n");
 
                             // Update the highestStat and bestWeights if necessary
                             if (ratio > highestStat) {
@@ -159,7 +182,7 @@ void empiricalTest() {
                                     bestWeights[i] = weights[i];
                                 }
                             }
-                            exit(0);
+                            // exit(0);
                         }
                     }
                 }
