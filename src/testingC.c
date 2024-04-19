@@ -122,6 +122,8 @@ void empiricalTest() {
     fclose(file);
 
     float highestStat = 0;
+    int bestCount = 0;
+    int bestTotalCount = 0;
     float bestWeights[7];
 
     // USE DATA PARALLELISM TO OPTIMIZE SPEED
@@ -156,7 +158,7 @@ void empiricalTest() {
                                 // printf("%f\n", probability);
 
                                 // Check if the prediction is correct
-                                if (probability >= 0.48) {
+                                if (probability >= 0.50) {
                                     totalCount++;
                                     if (data[i][0] == 1) {
                                         counter++;
@@ -180,6 +182,8 @@ void empiricalTest() {
                                 highestStat = ratio;
                                 for (int i = 0; i < 7; i++) {
                                     bestWeights[i] = weights[i];
+                                    bestCount = counter;
+                                    bestTotalCount = totalCount;
                                 }
                             }
                             // exit(0);
@@ -197,7 +201,7 @@ void empiricalTest() {
             printf(", ");
         }
     }
-    printf("], with %f\n", highestStat);
+    printf("], with %d \\ %d = %f\n", bestCount, bestTotalCount, highestStat);
 
     // TODO: Return the 'bestWeights' array
 }
