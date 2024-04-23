@@ -1,86 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-typedef struct {
-    float gpg_weight;
-    float last_5_gpg_weight;
-    float hgpg_weight;
-    float tgpg_weight;
-    float otga_weight;
-    float comp_weight;
-    float home_weight;
-} Weights;
-
-typedef struct {
-    int scored;
-    float gpg;
-    float last_5_gpg;
-    float hgpg;
-    float tgpg;
-    float otga;
-    float comp;
-    float home;
-} Stats;
-
-float getStat(Stats* stats, int i) {
-   switch(i) {
-    case 0: return stats->scored;
-    case 1: return stats->gpg;
-    case 2: return stats->last_5_gpg;
-    case 3: return stats->hgpg;
-    case 4: return stats->tgpg;
-    case 5: return stats->otga;
-    case 6: return stats->comp;
-    case 7: return stats->home;
-   }
-}
-
-void setStat(Stats* stats, int i, float value) {
-    switch(i) {
-     case 0: stats->scored = value; break;
-     case 1: stats->gpg = value; break;
-     case 2: stats->last_5_gpg = value; break;
-     case 3: stats->hgpg = value; break;
-     case 4: stats->tgpg = value; break;
-     case 5: stats->otga = value; break;
-     case 6: stats->comp = value; break;
-     case 7: stats->home = value; break;
-    }
-}
-
-float calculateStat(Stats* stats, Weights weights) {
-
-    float probability = 0;
-
-    float ratio = 0.18;
-    float composite = ratio * stats->comp + (1 - ratio) * stats->otga;
-
-    // replace the composite with the composite stat
-    Stats newData = {
-        stats->gpg,
-        stats->last_5_gpg,
-        stats->hgpg,
-        composite,
-        stats->otga,
-        stats->comp,
-        stats->home
-    };
-
-    probability += newData.gpg * weights.gpg_weight;
-    probability += newData.last_5_gpg * weights.last_5_gpg_weight;
-    probability += newData.hgpg * weights.hgpg_weight;
-    probability += newData.tgpg * weights.tgpg_weight;
-    probability += newData.otga * weights.otga_weight;
-    probability += newData.comp * weights.comp_weight;
-    probability += newData.home * weights.home_weight;
-
-    // Apply the sigmoid function?
-    // probability = 1 / (1 + exp(-probability));
-
-    return probability;
-}
+#include "testingC.h"
 
 void empiricalTest() {
     // Load the data
@@ -106,7 +24,25 @@ void empiricalTest() {
     rewind(file);
 
     // Allocate memory for the data array
-    Stats stats[numRows][9];
+
+    // Allocate memory for the data array dynamically
+    Stats **stats = (Stats **)malloc(numRows * sizeof(Stats *));
+    if (stats == NULL) {
+        printf("Memory allocation failed\n");
+        return;
+    }
+    for (int i = 0; i < numRows; i++) {
+        stats[i] = (Stats *)malloc(9 * sizeof(Stats));
+        if (stats[i] == NULL) {
+            printf("Memory allocation failed\n");
+            // Free previously allocated memory before returning
+            for (int j = 0; j < i; j++) {
+                free(stats[j]);
+            }
+            free(stats);
+            return;
+        }
+    }
 
     // Read the data from the file into the data array
     fgets(line, sizeof(line), file);
@@ -139,11 +75,11 @@ void empiricalTest() {
         
         // get ppg
         token = strtok(NULL, ",");
-        stats[i]->comp = atoi(token);
+        stats[i]->ppg = atoi(token);
 
         // get otpm
         token = strtok(NULL, ",");
-        stats[i]->otga = atoi(token);
+        stats[i]->otpm = atoi(token);
 
         // get tgpg
         token = strtok(NULL, ",");
@@ -158,10 +94,9 @@ void empiricalTest() {
         stats[i]->home = atof(token);
     }
 
-    printf("here\n");
     // Normalize the data array
     // Scale the data using Min-Max scaling
-    for (int j = 1; j < 9; j++) {
+    for (int j = 1; j < 8; j++) {
         float min = getStat(stats[0], j);
         float max = getStat(stats[0], j);
         
@@ -227,7 +162,7 @@ void empiricalTest() {
                                         counter++;
                                     }
                                 }
-
+                                exit(0);
                             }
 
                             // Calculate the ratio
