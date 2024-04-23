@@ -56,6 +56,7 @@ def calculateStat(row, weights):
     # Calculate the overallStat using the modified row
     overallStat = 0
     for w, stat in zip(weights, row_with_composite):
+        print(stat, w)
         result = w * stat
         overallStat += result
 
@@ -254,7 +255,6 @@ def empiricalTest():
                                 label = labels.loc[index]
 
                                 # Your further logic with the normalized features and label
-                                print(features.loc[index])
                                 probability = calculateStat(normalized_row, weights)
 
                                 # Print or use the calculated values

@@ -3,19 +3,78 @@
 #include <string.h>
 #include <math.h>
 
-float calculateStat(float data[], float weights[]) {
+typedef struct {
+    float gpg_weight;
+    float last_5_gpg_weight;
+    float hgpg_weight;
+    float tgpg_weight;
+    float otga_weight;
+    float comp_weight;
+    float home_weight;
+} Weights;
+
+typedef struct {
+    int scored;
+    float gpg;
+    float last_5_gpg;
+    float hgpg;
+    float tgpg;
+    float otga;
+    float comp;
+    float home;
+} Stats;
+
+float getStat(Stats* stats, int i) {
+   switch(i) {
+    case 0: return stats->scored;
+    case 1: return stats->gpg;
+    case 2: return stats->last_5_gpg;
+    case 3: return stats->hgpg;
+    case 4: return stats->tgpg;
+    case 5: return stats->otga;
+    case 6: return stats->comp;
+    case 7: return stats->home;
+   }
+}
+
+void setStat(Stats* stats, int i, float value) {
+    switch(i) {
+     case 0: stats->scored = value; break;
+     case 1: stats->gpg = value; break;
+     case 2: stats->last_5_gpg = value; break;
+     case 3: stats->hgpg = value; break;
+     case 4: stats->tgpg = value; break;
+     case 5: stats->otga = value; break;
+     case 6: stats->comp = value; break;
+     case 7: stats->home = value; break;
+    }
+}
+
+float calculateStat(Stats* stats, Weights weights) {
 
     float probability = 0;
 
     float ratio = 0.18;
-    float composite = ratio*data[5] + (1-ratio)*data[4];
+    float composite = ratio * stats->comp + (1 - ratio) * stats->otga;
 
     // replace the composite with the composite stat
-    float newData[7] = {data[1], data[2], data[3], composite, data[6], data[7], data[8]};
+    Stats newData = {
+        stats->gpg,
+        stats->last_5_gpg,
+        stats->hgpg,
+        composite,
+        stats->otga,
+        stats->comp,
+        stats->home
+    };
 
-    for (int i = 0; i < 7; i++) {
-        probability += newData[i] * weights[i];
-    }
+    probability += newData.gpg * weights.gpg_weight;
+    probability += newData.last_5_gpg * weights.last_5_gpg_weight;
+    probability += newData.hgpg * weights.hgpg_weight;
+    probability += newData.tgpg * weights.tgpg_weight;
+    probability += newData.otga * weights.otga_weight;
+    probability += newData.comp * weights.comp_weight;
+    probability += newData.home * weights.home_weight;
 
     // Apply the sigmoid function?
     // probability = 1 / (1 + exp(-probability));
@@ -47,7 +106,7 @@ void empiricalTest() {
     rewind(file);
 
     // Allocate memory for the data array
-    float data[numRows][9];
+    Stats stats[numRows][9];
 
     // Read the data from the file into the data array
     fgets(line, sizeof(line), file);
@@ -59,7 +118,7 @@ void empiricalTest() {
         token = strtok(NULL, ",");
         
         // get scored
-        data[i][0] = atoi(token);
+        stats[i]->scored = atoi(token);
 
         // skip name id team and bet
         for (int j=0; j<4; j++) {
@@ -68,53 +127,57 @@ void empiricalTest() {
 
         // get gpg
         token = strtok(NULL, ",");
-        data[i][1] = atof(token);
+        stats[i]->gpg = atof(token);
 
         // get last 5 gpg
         token = strtok(NULL, ",");
-        data[i][2] = atof(token);
+        stats[i]->last_5_gpg = atof(token);
 
         // get hgpg
         token = strtok(NULL, ",");
-        data[i][3] = atof(token);
-
+        stats[i]->hgpg = atof(token);
+        
         // get ppg
         token = strtok(NULL, ",");
-        data[i][4] = atoi(token);
+        stats[i]->comp = atoi(token);
 
         // get otpm
         token = strtok(NULL, ",");
-        data[i][5] = atoi(token);
+        stats[i]->otga = atoi(token);
 
         // get tgpg
         token = strtok(NULL, ",");
-        data[i][6] = atof(token);
+        stats[i]->tgpg = atof(token);
 
         // get otga
         token = strtok(NULL, ",");
-        data[i][7] = atof(token);
+        stats[i]->otga = atof(token);
 
         // get home
         token = strtok(NULL, ",");
-        data[i][8] = atof(token);
+        stats[i]->home = atof(token);
     }
 
+    printf("here\n");
     // Normalize the data array
     // Scale the data using Min-Max scaling
-    float min = data[0][0];
-    float max = data[0][0];
     for (int j = 1; j < 9; j++) {
+        float min = getStat(stats[0], j);
+        float max = getStat(stats[0], j);
+        
+        // Find the minimum and maximum values in the column
         for (int i = 0; i < numRows; i++) {
-            if (data[i][j] < min) {
-                min = data[i][j];
+            if (getStat(stats[i], j) < min) {
+                min = getStat(stats[i], j);
             }
-            if (data[i][j] > max) {
-                max = data[i][j];
+            if (getStat(stats[i], j) > max) {
+                max = getStat(stats[i], j);
             }
         }
-
+        
+        // Normalize the values in the column
         for (int i = 0; i < numRows; i++) {
-            data[i][j] = (data[i][j] - min) / (max - min);
+            setStat(stats[i], j, (getStat(stats[i], j) - min) / (max - min));
         }
     }
 
@@ -124,7 +187,7 @@ void empiricalTest() {
     float highestStat = 0;
     int bestCount = 0;
     int bestTotalCount = 0;
-    float bestWeights[7];
+    Weights bestWeights;
 
     // USE DATA PARALLELISM TO OPTIMIZE SPEED
 
@@ -135,18 +198,18 @@ void empiricalTest() {
             for (int hgpg_weight = 0; hgpg_weight <= 10 - gpg_weight - last_5_gpg_weight; hgpg_weight++) {
                 for (int tgpg_weight = 0; tgpg_weight <= 10 - gpg_weight - last_5_gpg_weight - hgpg_weight; tgpg_weight++) {
                     for (int otga_weight = 0; otga_weight <= 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight; otga_weight++) {
-                        for (int comp_weight = 0; comp_weight <= 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight; comp_weight++) {
-                            int home_weight = 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight - comp_weight;
+                        for (int home_weight = 0; home_weight <= 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight; home_weight++) {
+                            int comp_weight = 10 - gpg_weight - last_5_gpg_weight - hgpg_weight - tgpg_weight - otga_weight - home_weight;
 
                             // Normalized weights
-                            float weights[7] = {
+                            Weights weights = {
                                 (float)gpg_weight / 10,
                                 (float)last_5_gpg_weight / 10,
                                 (float)hgpg_weight / 10,
                                 (float)tgpg_weight / 10,
                                 (float)otga_weight / 10,
+                                (float)comp_weight / 10,
                                 (float)home_weight / 10,
-                                (float)comp_weight / 10
                             };
 
                             int counter = 0;
@@ -154,18 +217,18 @@ void empiricalTest() {
 
                             for (int i = 0; i < numRows; i++) {
                                 // Calculate the probability of scoring
-                                float probability = calculateStat(data[i], weights);
+                                float probability = calculateStat(stats[i], weights);
                                 // printf("%f\n", probability);
 
                                 // Check if the prediction is correct
                                 if (probability >= 0.50) {
                                     totalCount++;
-                                    if (data[i][0] == 1) {
+                                    if (getStat(stats[i], 0) == 1) {
                                         counter++;
                                     }
                                 }
-                            }
 
+                            }
 
                             // Calculate the ratio
                             float ratio = (float)counter / totalCount;
@@ -181,7 +244,7 @@ void empiricalTest() {
                             if (ratio > highestStat) {
                                 highestStat = ratio;
                                 for (int i = 0; i < 7; i++) {
-                                    bestWeights[i] = weights[i];
+                                    bestWeights = weights;
                                     bestCount = counter;
                                     bestTotalCount = totalCount;
                                 }
@@ -196,7 +259,7 @@ void empiricalTest() {
 
     printf("Highest weights: [");
     for (int i = 0; i < 7; i++) {
-        printf("%f", bestWeights[i]);
+        printf("%f", bestWeights);
         if (i < 6) {
             printf(", ");
         }
